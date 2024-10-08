@@ -1,0 +1,50 @@
+services:
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERSION} # OR jellyfin/jellyfin (official)
+    container_name: jellyfin
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - NVIDIA_VISIBLE_DEVICES=all
+    devices:
+      - /dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools
+      - /dev/nvidia-modeset
+      - /dev/nvidiactl
+      - /dev/nvidia0
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - ${MEDIA_LIBRARY_PATH}:/media_library :ro
+    ports:
+      - 8096:8096/tcp # http webUI
+      - 8920:8920/tcp # https webUI
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:${JELLYSEERR_VERSION}
+    container_name: jellyseerr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - LOG_LEVEL=debug
+      - TZ=${TIMEZONE}
+    volumes:
+      - jellyseerr-config:/app/config
+    ports:
+      - 5055:5055
+
+volumes:
+  jellyfin-config:
+  jellyfin-cache:
+  jellyseerr-config:

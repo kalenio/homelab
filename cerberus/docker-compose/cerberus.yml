@@ -1,0 +1,23 @@
+# config is used with a custom build of caddy from a dockerfile.
+services:
+  caddy:
+    build: .
+    security_opt:
+      - label:disable
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${CADDYFILE_PATH}:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    ports:
+      - 80:80
+      - 443:443
+
+volumes:
+  caddy-data:
+  caddy-config:
