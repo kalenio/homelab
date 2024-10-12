@@ -97,17 +97,9 @@ services:
     container_name: ntfy
     security_opt:
       - no-new-privileges:true
+    restart: unless-stopped
     command:
       - serve
-    environment:
-      - PUID=${PUID}
-      - PGID=${PUID}
-      - TZ=Etc/UTC
-    volumes:
-      - ntfy_cache:/var/cache/ntfy
-      - ntfy_data:/etc/ntfy
-    ports:
-      - 8000:80
     healthcheck: # optional: remember to adapt the host:port to your environment
       test:
         [
@@ -118,7 +110,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    restart: unless-stopped
+    environment:
+      PUID: ${PUID}
+      PGID: ${PUID}
+      TZ: Etc/UTC
+    volumes:
+      - ntfy_cache:/var/cache/ntfy
+      - ntfy_data:/etc/ntfy
+    ports:
+      - 8000:80
 
   #prometheus:
   #image: prom/prometheus:latest
