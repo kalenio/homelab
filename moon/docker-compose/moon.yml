@@ -34,7 +34,7 @@ services:
 
   syncthing:
     image: lscr.io/linuxserver/syncthing:${SYNCTHING_VERSION}
-    hostname: syncthing
+    container_name: syncthing
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
