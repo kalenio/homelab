@@ -18,8 +18,8 @@ services:
       - start
       - --disable-csrf-token-checks
       - --address=0.0.0.0:51515
-      - --tls-key-file=${KOPIA_KEY_PATH}
-      - --tls-cert-file=${KOPIA_CERT_PATH}
+      - --tls-key-file=/tls/kopia-key.pem
+      - --tls-cert-file=/tls/kopia-cert.pem
       - --server-username=${KOPIA_SERVER_USER}
       - --server-password=${KOPIA_SERVER_PASSWORD}
     volumes:
@@ -29,6 +29,8 @@ services:
       - ./kopia/config:/app/config
       - ./kopia/cache:/app/cache
       - ./kopia/logs:/app/logs
+      # TLS private key and cert path. Both key and cert must be generated via openssl on host BEFORE bringing up containers. 
+      - ./kopia/tls:/tls
     ports:
       - 51515:51515 # WebUI
     networks:
