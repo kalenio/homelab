@@ -18,6 +18,8 @@ services:
       - start
       - --disable-csrf-token-checks
       - --address=0.0.0.0:51515
+      - --tls-cert-file=/home/oberon/kopia/tls/kopia-cert.pem
+      - --tls-key-file=/home/oberon/kopia/tls/kopia-key.pem
       - --server-username=${KOPIA_SERVER_USER}
       - --server-password=${KOPIA_SERVER_PASSWORD}
     volumes:
