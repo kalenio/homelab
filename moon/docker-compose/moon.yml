@@ -10,8 +10,8 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
-      - KOPIA_PASSWORD=${KOPIA_PASSWORD} # repository password
       - USER=${KOPIA_USER} # repository user
+      - KOPIA_PASSWORD=${KOPIA_PASSWORD} # repository password
     # Setup the server that provides the web ui
     command:
       - server
@@ -20,8 +20,8 @@ services:
       - --address=0.0.0.0:51515
       - --tls-key-file=/tls/kopia-key.pem
       - --tls-cert-file=/tls/kopia-cert.pem
-      - --server-username=${KOPIA_SERVER_USER}
-      - --server-password=${KOPIA_SERVER_PASSWORD}
+      - --server-username=${KOPIA_USER}
+      - --server-password=${KOPIA_PASSWORD}
     volumes:
       - ./kopia/backups:/repository # Path for storing snapshots, aka encrypted backups
       - ./kopia/snapshots:/tmp:shared # Path for browsing mounted snaphots
