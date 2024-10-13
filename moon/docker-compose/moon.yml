@@ -1,63 +1,72 @@
 services:
+
   kopia:
     image: kopia/kopia:${KOPIA_VERSION}
     container_name: Kopia
-    hostname: kopia-moon # Because the Docker environment uses random hostnames for its containers, it is recommended to explicitly set them using hostname. The name will be persisted in a configuration file and used afterwards.
     user: '0:0'
-    restart: 'unless-stopped'
     privileged: true
     cap_add:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
       - no-new-privileges:true
+    restart: unless-stopped
     environment:
-      PUID: ${UID}
-      PGID: ${GID}
-      TZ: ${TIMEZONE}
-      KOPIA_PASSWORD: ${KOPIA_PASSWORD}
-      USER: ${KOPIA_USER}
+      - TZ=${TIMEZONE}
+      - KOPIA_PASSWORD=${KOPIA_PASSWORD}
+      - USER=${KOPIA_USER}
     devices:
       - /dev/fuse:/dev/fuse:rwm
     command:
       - server
       - start
-      - --disable-csrf-token-checks
+#      - --disable-csrf-token-checks
       - --tls-cert-file=/data/home/XXX/ssl-certs/fullchain.pem
       - --tls-key-file=/data/home/XXX/ssl-certs/privkey.pem
-      - --address=192.168.1.107:51515
+      - --address=${HOST_IP}:51515
       - --server-username=${SERVER_USER}
       - --server-password=${SERVER_PASSWORD}
     volumes:
-      - /mnt/kopia:/tmp:shared
+      - /mnt/kopia/tmp:/tmp:shared
+      - /mnt/kopia/cache:/app/cache
       - kopia_config:/app/config
-      - kopia_cache:/app/cache
       - kopia_logs:/app/logs
       - /:/data:ro
     ports:
-      - 51515:51515
+      - 51515:51515 # WebUI
+    networks:
+      - moon_network
+
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:${SYNCTHING_VERSION}
+    hostname: syncthing
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - syncthing_config:/config
+      - syncthing_data1:/data1
+      - syncthing_data2:/data2
+    ports:
+      - 8384:8384 # WebUI
+      - 22000:22000/tcp # TCP listening port
+      - 22000:22000/udp # UDP listening port
+      - 21027:21027/udp # Protocol discovery
+    networks:
+      - moon_network
 
 volumes:
   kopia_config:
   kopia_cache:
   kopia_logs:
+  syncthing_config:
+  syncthing_data1:
+  syncthing_data2:
 
-### IF you would like to assign hostname and domain name to your server.
-#      hostname: "XXX"
-#      domainname: "XXX"
+networks:
+  moon_network:
 
-### If you want to assign ip to your container with an existing Docker Network.
-### Existing networks name is "Docker" in below example. Just change it with your own.
-#      networks:
-#        Docker:
-#          ipv4_address: aaa.bbb.ccc.ddd
-
-#### If you would like to assign DNS Server
-#      dns:
-#        - 8.8.8.8
-#
-
-### Existing Networks should be defined as external.
-#networks:
-#  Docker:
-#    external: true
