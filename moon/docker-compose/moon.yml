@@ -19,6 +19,8 @@ vorta:
       - ./vorta/backups:/destination
     ports:
       - 5811:5800
+    networks:
+      - moon_network
 
   kopia:
     image: kopia/kopia:${KOPIA_VERSION} # https://kopia.io/docs/installation/#docker-images
