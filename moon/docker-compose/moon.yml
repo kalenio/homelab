@@ -48,8 +48,6 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./syncthing/config:/config
-      - ./syncthing/data1:/data1
-      - ./syncthing/data2:/data2
     ports:
       - 8384:8384 # WebUI
       - 22000:22000/tcp # TCP listening port
