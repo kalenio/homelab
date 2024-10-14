@@ -1,5 +1,25 @@
 services:
 
+vorta:
+    image: ghcr.io/borgbase/vorta-docker:${VORTA_VERSION} # https://github.com/borgbase/vorta-docker
+    container_name: vorta
+    hostname: vorta
+    restart: unless-stopped
+#    cap_add:
+#      - SYS_ADMIN
+#    security_opt:
+#      - apparmor:unconfined
+#    privileged: true
+    environment:
+      - USER_ID=${UID}
+      - GROUP_ID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./vorta/config:/config
+      - ./vorta/backups:/destination
+    ports:
+      - 5811:5800
+
   kopia:
     image: kopia/kopia:${KOPIA_VERSION} # https://kopia.io/docs/installation/#docker-images
     container_name: kopia
