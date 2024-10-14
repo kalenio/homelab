@@ -1,6 +1,6 @@
 services:
 
-vorta:
+  vorta:
     image: ghcr.io/borgbase/vorta-docker:${VORTA_VERSION} # https://github.com/borgbase/vorta-docker
     container_name: vorta
     hostname: vorta
