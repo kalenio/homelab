@@ -176,7 +176,7 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
-      - GF_SERVER_ROOT_URL=http://my.grafana.server/
+      - GF_SERVER_ROOT_URL=${GRAFANA_SERVER_URL}
       - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
     volumes:
       - ./grafana/data:/var/lib/grafana
@@ -195,7 +195,7 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
-      - APPRISE_ATTACH_SIZE=128 # optional, max attachment size in Mb. 0 disables attachments.
+      - APPRISE_ATTACH_SIZE=64 # optional, max attachment size in Mb. 0 disables attachments.
     volumes:
       - ./apprise/config:/config
       - ./apprise/attachments:/attachments # optional
