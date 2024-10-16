@@ -120,75 +120,75 @@ services:
     ports:
       - 8000:80
 
-  #prometheus:
-  #image: prom/prometheus:latest
-  #container_name: prometheus
-  #security_opt:
-  #- no-new-privileges:true
-  #restart: unless-stopped
-  #environment:
-  #- PUID=3000
-  #- PGID=3000
-  #- TZ=Etc/UTC
-  #volumes:
-  #- ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml #must manually create?
-  #- prometheus_data:/prometheus
-  #ports:
-  #- 9090:9090
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VER}
+    container_name: prometheus
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml #must manually create?
+      - prometheus_data:/prometheus
+    ports:
+      - 9090:9090
 
-  #grafana:
-  #image: grafana/grafana-oss:latest
-  #container_name: grafana
-  #security_opt:
-  #- no-new-privileges:true
-  #restart: unless-stopped
-  #environment:
-  #- PUID=3000
-  #- PGID=3000
-  #- TZ=Etc/UTC
-  #- GF_SERVER_ROOT_URL=http://my.grafana.server/
-  #- GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
-  #volumes:
-  #- grafana_data:/var/lib/grafana
-  #ports:
-  #- 3002:3000 # <Host/External Port>:<Container/Internal Port>
+  grafana:
+    image: grafana/grafana:${GRAFANA_VER}
+    container_name: grafana
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - GF_SERVER_ROOT_URL=http://my.grafana.server/
+      - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - 3002:3000 # <Host/External Port>:<Container/Internal Port>
 
-  #influxdb:
-  #image: influxdb:latest  # You can specify a specific version, like influxdb:2.7
-  #container_name: influxdb
-  #security_opt:
-  #- no-new-privileges:true
-  #restart: unless-stopped
-  #environment:
-  #- PUID=3000
-  #- PGID=3000
-  #- TZ=Etc/UTC
-  #- INFLUXDB_ADMIN_USER=admin  # Admin user for InfluxDB
-  #- INFLUXDB_ADMIN_PASSWORD=adminpassword  # Admin password
-  #- INFLUXDB_BUCKET=mybucket  # Default bucket
-  #- INFLUXDB_ORG=myorg  # Default organization
-  #- INFLUXDB_TOKEN=mytoken  # Authentication token
-  #volumes:
-  #- influxdb_data:/var/lib/influxdb2  # Persistent storage for InfluxDB
-  #ports:
-  #- 8086:8086  # InfluxDB's default port
+  influxdb:
+    image: influxdb:${INFLUXDB_VER}  # You can specify a specific version, like influxdb:2.7
+    container_name: influxdb
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ={TIMEZONE}
+      - INFLUXDB_ADMIN_USER=${INFLUXDB_ADMIN_USER}  # Admin user for InfluxDB
+      - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASS}  # Admin password
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKERT}  # Default bucket
+      - INFLUXDB_ORG=${INFLUXDB_ORG}  # Default organization
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}  # Authentication token
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb2  # Persistent storage for InfluxDB
+    ports:
+      - 8086:8086  # InfluxDB's default port
 
-  #apprise-api:
-  #image: lscr.io/linuxserver/apprise-api:latest
-  #container_name: apprise-api
-  #security_opt:
-  #- no-new-privileges:true
-  #restart: unless-stopped
-  #environment:
-  #- PUID=3000
-  #- PGID=3000
-  #- TZ=Etc/UTC
-  #- APPRISE_ATTACH_SIZE=128 # optional, max attachment size in Mb. 0 disables attachments.
-  #volumes:
-  #- apprise_config:/config
-  #- apprise_attachments:/attachments # optional
-  #ports:
-  #- 8888:8000
+  apprise-api:
+    image: lscr.io/linuxserver/apprise-api:${APPRISE_VER}
+    container_name: apprise-api
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - APPRISE_ATTACH_SIZE=128 # optional, max attachment size in Mb. 0 disables attachments.
+    volumes:
+      - ./apprise/config:/config
+      - ./apprise/attachments:/attachments # optional
+    ports:
+      - 8888:8000
 
 volumes:
   homepage_config:
