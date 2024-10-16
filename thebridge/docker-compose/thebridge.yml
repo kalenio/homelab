@@ -49,7 +49,7 @@ services:
     networks:
       thebridge_net:
 
-  postgres-db:
+  postgres-db: # db for speedtest-tracker
     image: postgres:${POSTGRES_VER}
     container_name: postgres-db
     security_opt:
