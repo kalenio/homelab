@@ -11,7 +11,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - homepage_config:/app/config 
+      - homepage_config:/app/config
       - homepage_images:/app/public/images
 #      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations. USE SOCKET PROXY INSTEAD: https://github.com/Tecnativa/docker-socket-proxy
     ports:
