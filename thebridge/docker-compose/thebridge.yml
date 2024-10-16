@@ -139,9 +139,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    user: "${UID}:${GID}"
     environment:
-      - PUID=${UID}
-      - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
@@ -172,9 +171,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    user: "${UID}:${GID}"
     environment:
-      - PUID=${UID}
-      - PGID=${GID}
       - TZ=${TIMEZONE}
       - GF_SERVER_ROOT_URL=${GRAFANA_SERVER_URL}
       - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
