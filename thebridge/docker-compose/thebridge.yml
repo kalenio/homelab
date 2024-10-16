@@ -144,7 +144,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Main config. Sets global settings, scrape targets, alerting rules, service discovery, etc.
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
       - ./prometheus/data:/prometheus
     ports:
       - 9090:9090
