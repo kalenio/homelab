@@ -72,7 +72,7 @@ services:
       - WEBUI_PORT=8085
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
     volumes:
-      - qbittorrent-config:/config
+      - ./qbittorrent/config:/config
       - ${TORRENTS_PATH}:media/downloads/torrents:rw
     depends_on:
       gluetun:
@@ -90,7 +90,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - sabnzbd-config:/config
+      - ./sabnzbd/config:/config
       - ${USENET_PATH}:/media/downloads/usenet:rw
     depends_on:
       gluetun:
@@ -110,7 +110,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - sonarr-config:/config
+      - ./sonarr/config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${SERIES_PATH}:/media/library/series
     depends_on:
@@ -129,7 +129,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - radarr-config:/config
+      - ./radarr/config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${MOVIES_PATH}:/media/library/movies
     depends_on:
@@ -148,7 +148,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - lidarr-config:/config
+      - ./lidarr/config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${MUSIC_PATH}:/media/library/music
     depends_on:
@@ -167,7 +167,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - readarr-config:/config
+      - ./readarr/config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${BOOKS_PATH}:/media/library/books
     depends_on:
@@ -186,7 +186,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - prowlar-config:/config
+      - ./prowlar/config:/config
       - ${MEDIA_ROOT_PATH}:/media
     depends_on:
       gluetun:
@@ -204,20 +204,10 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - bazarr-config:/config
+      - ./bazarr/config:/config
       - ${MOVIES_PATH}:/media/library/movies
       - ${SERIES_PATH}:/media/library/series
     depends_on:
       gluetun:
         condition: service_healthy
 
-volumes:
-  gluetun:
-  qbittorrent-config:
-  sabnzbd-config:
-  sonarr-config:
-  radarr-config:
-  lidarr-config:
-  readarr-config:
-  prowlar-config:
-  bazarr-config:
