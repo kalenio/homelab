@@ -18,6 +18,96 @@ services:
       - 3000:3000
     networks:
       thebridge_net:
+      
+  homeassistant:
+    image: homeassistant/home-assistant:${HOMEASSISTANT_VER}
+    container_name: homeassistant
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./homeassistant/config:/config
+    ports:
+      - 8123:8123
+    networks:
+      thebridge_net:
+
+# ----------------------------- #
+# -------- Monitoring --------- #
+# ----------------------------- #
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VER}
+    container_name: prometheus
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    user: "${UID}:${GID}"
+    environment:
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
+      - ./prometheus/data:/prometheus
+    ports:
+      - 9090:9090
+    networks:
+      thebridge_net:
+
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VER}
+    container_name: prometheus-node-exporter
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+#    cap_add:
+#      - SYS_TIME     # Optional, for time metrics if needed
+#      - NET_ADMIN    # Optional, for advanced network metrics
+    user: "${UID}:${GID}"
+#    pid: host
+#    volumes:
+#      - '/:/host:ro,rslave'
+#    ports:
+#      - 9090:9090
+    network_mode: host
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
+    container_name: uptime-kuma
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${UID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./uptime-kuma/data:/data
+    ports:
+      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
+    networks:
+      thebridge_net:
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VER}
+    container_name: grafana
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    user: "${UID}:${GID}"
+    environment:
+      - TZ=${TIMEZONE}
+      - GF_SERVER_ROOT_URL=${GRAFANA_SERVER_URL}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    ports:
+      - 3002:3000 # <Host/External Port>:<Container/Internal Port>
+    networks:
+      thebridge_net:
 
   speedtest-tracker:
     image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER}
@@ -68,41 +158,11 @@ services:
       - 5432:5432
     networks:
       thebridge_net:
-
-  homeassistant:
-    image: homeassistant/home-assistant:${HOMEASSISTANT_VER}
-    container_name: homeassistant
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    environment:
-      - PUID=${UID}
-      - PGID=${GID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - homeassistant_config:/config
-    ports:
-      - 8123:8123
-    networks:
-      thebridge_net:
-
-  uptime-kuma:
-    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
-    container_name: uptime-kuma
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    environment:
-      - PUID=${UID}
-      - PGID=${UID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - uptime-kuma_data:/data
-    ports:
-      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
-    networks:
-      thebridge_net:
-
+      
+# ----------------------------- #
+# ------- Notifications ------- #
+# ----------------------------- #
+      
   ntfy:
     image: binwiederhier/ntfy:${NTFY_VER}
     container_name: ntfy
@@ -126,62 +186,10 @@ services:
       - PGID=${UID}
       - TZ=${TIMEZONE}
     volumes:
-      - ntfy_cache:/var/cache/ntfy
-      - ntfy_data:/etc/ntfy
+      - ./ntfy/cache:/var/cache/ntfy
+      - ./ntfy/data:/etc/ntfy
     ports:
       - 8000:80
-    networks:
-      thebridge_net:
-
-  prometheus:
-    image: prom/prometheus:${PROMETHEUS_VER}
-    container_name: prometheus
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    user: "${UID}:${GID}"
-    environment:
-      - TZ=${TIMEZONE}
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
-      - ./prometheus/data:/prometheus
-    ports:
-      - 9090:9090
-    networks:
-      thebridge_net:
-
-  node-exporter:
-    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VER}
-    container_name: node-exporter
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-#    cap_add:
-#      - SYS_TIME     # Optional, for time metrics if needed
-#      - NET_ADMIN    # Optional, for advanced network metrics
-    user: "${UID}:${GID}"
-#    pid: host
-#    volumes:
-#      - '/:/host:ro,rslave'
-#    ports:
-#      - 9090:9090
-    network_mode: host
-
-  grafana:
-    image: grafana/grafana:${GRAFANA_VER}
-    container_name: grafana
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    user: "${UID}:${GID}"
-    environment:
-      - TZ=${TIMEZONE}
-      - GF_SERVER_ROOT_URL=${GRAFANA_SERVER_URL}
-      - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
-    volumes:
-      - ./grafana/data:/var/lib/grafana
-    ports:
-      - 3002:3000 # <Host/External Port>:<Container/Internal Port>
     networks:
       thebridge_net:
 
@@ -213,7 +221,3 @@ volumes:
   speedtest-tracker_config:
   speedtest-tracker_keys:
   postgres-data:
-  homeassistant_config:
-  uptime-kuma_data:
-  ntfy_cache:
-  ntfy_data:
