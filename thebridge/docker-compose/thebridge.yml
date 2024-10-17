@@ -85,6 +85,7 @@ services:
       - TZ=${TIMEZONE}
       - GF_SERVER_ROOT_URL=${GRAFANA_SERVER_URL}
       - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
+#      - GF_LOG_LEVEL=debug
     volumes:
       - ./grafana/data:/var/lib/grafana
     ports:
