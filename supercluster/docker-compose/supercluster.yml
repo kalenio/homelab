@@ -54,6 +54,9 @@ services:
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=${TIMEZONE}
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   qbittorrent: # https://docs.linuxserver.io/images/docker-qbittorrent/
     image: lscr.io/linuxserver/qbittorrent:${QBITTORRENT_VERSION}
@@ -71,6 +74,9 @@ services:
     volumes:
       - qbittorrent-config:/config
       - ${TORRENTS_PATH}:media/downloads/torrents:rw
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   sabnzbd: # https://docs.linuxserver.io/images/docker-sabnzbd/#usage
     image: lscr.io/linuxserver/sabnzbd:${SABNZBD_VERSION}
@@ -86,7 +92,10 @@ services:
     volumes:
       - sabnzbd-config:/config
       - ${USENET_PATH}:/media/downloads/usenet:rw
-
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        
   ###### ----- Media Management ----- ######
 
   sonarr: # https://docs.linuxserver.io/images/docker-sonarr/?h=sonarr
@@ -104,6 +113,9 @@ services:
       - sonarr-config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${SERIES_PATH}:/media/library/series
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   radarr: # https://docs.linuxserver.io/images/docker-radarr/#media-folders
     image: lscr.io/linuxserver/radarr:${RADARR_VERSION}
@@ -120,6 +132,9 @@ services:
       - radarr-config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${MOVIES_PATH}:/media/library/movies
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   lidarr: # https://docs.linuxserver.io/images/docker-lidarr/#media-folders
     image: lscr.io/linuxserver/lidarr:${LIDARR_VERSION}
@@ -136,6 +151,9 @@ services:
       - lidarr-config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${MUSIC_PATH}:/media/library/music
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   readarr:
     image: lscr.io/linuxserver/readarr:${READARR_VERSION}
@@ -152,6 +170,9 @@ services:
       - readarr-config:/config
       - ${DOWNLOADS_PATH}:/media/downloads
       - ${BOOKS_PATH}:/media/library/books
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   prowlarr: # https://docs.linuxserver.io/images/docker-prowlarr/
     image: lscr.io/linuxserver/prowlarr:${PROWLARR_VERSION}
@@ -167,6 +188,9 @@ services:
     volumes:
       - prowlar-config:/config
       - ${MEDIA_ROOT_PATH}:/media
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:${BAZARR_VERSION}
@@ -183,6 +207,9 @@ services:
       - bazarr-config:/config
       - ${MOVIES_PATH}:/media/library/movies
       - ${SERIES_PATH}:/media/library/series
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
 volumes:
   gluetun:
