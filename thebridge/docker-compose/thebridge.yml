@@ -71,7 +71,7 @@ services:
 #    volumes:
 #      - '/:/host:ro,rslave'
 #    ports:
-#      - 9090:9090
+#      - 9100:9100
     network_mode: host
 
   uptime-kuma:
