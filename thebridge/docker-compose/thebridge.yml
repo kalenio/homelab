@@ -74,23 +74,6 @@ services:
 #      - 9100:9100
     network_mode: host
 
-  uptime-kuma:
-    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
-    container_name: uptime-kuma
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    environment:
-      - PUID=${UID}
-      - PGID=${UID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - ./uptime-kuma/data:/data
-    ports:
-      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
-    networks:
-      thebridge_net:
-
   grafana:
     image: grafana/grafana:${GRAFANA_VER}
     container_name: grafana
@@ -158,7 +141,27 @@ services:
       - 5432:5432
     networks:
       thebridge_net:
-      
+
+
+# image does not yet support running as non-root user. https://github.com/louislam/uptime-kuma/pull/2086
+
+#  uptime-kuma:
+#    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
+#    container_name: uptime-kuma
+#    security_opt:
+#      - no-new-privileges:true
+#    restart: unless-stopped
+#    user: "${UID}:${GID}"
+#    environment:
+#      - TZ=${TIMEZONE}
+#    volumes:
+#      - ./uptime-kuma/data:/data
+#    ports:
+#      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
+#    networks:
+#      thebridge_net:
+
+    
 # ----------------------------- #
 # ------- Notifications ------- #
 # ----------------------------- #
