@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./tandoor/postgresql:/var/lib/postgresql/data
+    networks:
+      hyperion_net:
 
   web_recipes:
     image: vabene1111/recipes
@@ -21,6 +23,8 @@ services:
       - nginx_config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - db_recipes
+    networks:
+      hyperion_net:
 
   nginx_recipes:
     image: nginx:mainline-alpine
@@ -28,14 +32,16 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
-    ports:
-      - 8086:80
     volumes:
       - ./tandoor/recipes:/static:ro
       - ./tandoor/recipes:/media:ro
       - nginx_config:/etc/nginx/conf.d:ro # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - web_recipes
+    ports:
+      - 8086:80
+    networks:
+      hyperion_net:
       
 networks:
   hyperion_net:
