@@ -6,6 +6,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    env_file:
+      - ./hyperion.env
     volumes:
       - ./tandoor/postgresql:/var/lib/postgresql/data
     networks:
@@ -17,6 +19,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    env_file:
+      - ./hyperion.env
     volumes:
       - ./tandoor/recipes:/opt/recipes/staticfiles
       - ./tandoor/media:/opt/recipes/mediafiles
@@ -32,6 +36,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    env_file:
+      - ./hyperion.env
     volumes:
       - ./tandoor/recipes:/static:ro
       - ./tandoor/recipes:/media:ro
