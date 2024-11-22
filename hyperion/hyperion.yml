@@ -1,12 +1,13 @@
 services:
 
   db_recipes:
-    restart: unless-stopped
     image: postgres:16-alpine
+    container_name: tandoor-db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
     volumes:
       - ./postgresql:/var/lib/postgresql/data
-    env_file:
-      - ./.env
 
   web_recipes:
     image: vabene1111/recipes
@@ -14,33 +15,30 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
-    environment:
-      - PUID=${UID}
-      - PGID=${GID}
-      - TZ=${TIMEZONE}
-    env_file:
-      - ./.env
     volumes:
       - ./tandoor/recipes:/opt/recipes/staticfiles
-      - ./tandoor/mediafiles:/opt/recipes/mediafiles
+      - ./tandoor/media:/opt/recipes/mediafiles
       - nginx_config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - db_recipes
 
   nginx_recipes:
     image: nginx:mainline-alpine
+    container_name: tandoor-nginx
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     ports:
-      - 80:80
-    env_file:
-      - ./.env
+      - 8086:80
+    volumes:
+      - ./tandoor/recipes:/static:ro
+      - ./tandoor/recipes:/media:ro
+      - nginx_config:/etc/nginx/conf.d:ro # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - web_recipes
-    volumes:
-      # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
-      - nginx_config:/etc/nginx/conf.d:ro
-      - staticfiles:/static:ro
-      - ./mediafiles:/media:ro
+      
+networks:
+  hyperion_net:
 
 volumes:
   nginx_config:
