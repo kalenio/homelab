@@ -7,7 +7,7 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     volumes:
-      - ./postgresql:/var/lib/postgresql/data
+      - ./tandoor/postgresql:/var/lib/postgresql/data
 
   web_recipes:
     image: vabene1111/recipes
