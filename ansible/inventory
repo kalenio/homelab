@@ -1,1 +1,2 @@
-192.168.1.201
+[all]
+testHost ansible_host=192.168.1.250 ansible_ssh_port=22
