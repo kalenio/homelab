@@ -23,7 +23,7 @@ services:
       - ./hyperion.env
     volumes:
       - ./tandoor/recipes:/opt/recipes/staticfiles
-      - ./tandoor/media:/opt/recipes/mediafiles
+      - ./tandoor/mediafiles:/opt/recipes/mediafiles
       - nginx_config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - db_recipes
