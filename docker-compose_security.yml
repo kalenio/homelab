@@ -1,4 +1,4 @@
-# This is an template for optional docker-compose parameters to increase container security.
+# This is a template for optional docker-compose parameters to increase container security.
 
 services:
 
@@ -10,7 +10,7 @@ services:
       - cap_drop=ALL # Drop all capabilities and add only necessary ones
     read_only: true # Prevent container from writing anything to the host
     restart: unless-stopped
-    tmpfs: # Mount tmpfs for temporary data
+    tmpfs: # Mount /tmp as memory-backed instead of disk-backed
       - /tmp
     deploy: # Limit maximum system resources available to the container
       resources: 
