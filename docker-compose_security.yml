@@ -1,4 +1,5 @@
-# This is a template for optional docker-compose parameters to increase container security.
+# This is a template for docker-compose parameters that increase container security.
+# Use with discretion, as not all parameters will work with all containers, and containers tend to get grumpy when you bubble-wrap them. 
 
 services:
 
