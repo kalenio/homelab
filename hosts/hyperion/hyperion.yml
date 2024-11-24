@@ -19,6 +19,7 @@ services:
           memory: 512M
     env_file: hyperion.env
     environment:
+      # DATABASE_URL = engine://username:password@host:port/dbname
       - DATABASE_URL=postgresql://postgres:${LINKW_PG_PASSWORD}@postgres:5432/postgres
     volumes:
       - ./linkwarden/data:/data/data
