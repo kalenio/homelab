@@ -4,25 +4,6 @@ services:
 #------ Linkwarden ------#
 #-------------------------#
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: linkwarden_db
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    tmpfs:
-      - /tmp
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 512M
-    env_file: hyperion.env
-    volumes:
-      - ./linkwarden/pgdata:/var/lib/postgresql/data
-    networks:
-      linkwarden_net:
-
   linkwarden:
     image: ghcr.io/linkwarden/linkwarden:latest
     container_name: linkwarden
@@ -46,6 +27,27 @@ services:
       - 3000:3000
     depends_on:
       - postgres
+    networks:
+      linkwarden_net:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: linkwarden_db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    environment:
+      - POSTGRES_PASSWORD=${LINKW_POSTGRES_PASSWORD}
+    volumes:
+      - ./linkwarden/pgdata:/var/lib/postgresql/data
     networks:
       linkwarden_net:
 
@@ -94,6 +96,8 @@ services:
           memory: 512M
     env_file:
       - hyperion.env
+    environment:
+      - POSTGRES_PASSWORD=${TANDOOR_POSTGRES_PASSWORD}
     volumes:
       - ./tandoor/postgresql:/var/lib/postgresql/data
     networks:
