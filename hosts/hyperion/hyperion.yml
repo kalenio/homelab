@@ -1,8 +1,8 @@
 services:
 
-#-------------------------#
-#------ Linkwarden ------#
-#-------------------------#
+# -----------------------------------------------------------------
+# Linkwarden: https://docs.linkwarden.app/self-hosting/installation
+# -----------------------------------------------------------------
 
   linkwarden:
     image: ghcr.io/linkwarden/linkwarden:latest
@@ -17,8 +17,7 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file:
-      - hyperion.env
+    env_file: hyperion.env
     environment:
       - DATABASE_URL=postgresql://postgres:${LINKW_POSTGRES_PASSWORD}@postgres:5432/postgres
     volumes:
@@ -51,35 +50,9 @@ services:
     networks:
       linkwarden_net:
 
-#-------------------------#
-#------- Linkding --------#
-#-------------------------#
-
-  linkding:
-    image: sissbruecker/linkding:${LINKD_VERS:-latest-alpine} # https://hub.docker.com/r/sissbruecker/linkding/tags
-    container_name: "${LINKD_CONTAINER_NAME:-linkding}"
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    tmpfs:
-      - /tmp
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 512M
-    env_file:
-      - hyperion.env
-    volumes:
-      - "${LINKD_HOST_DATA_DIR:-./data}:/etc/linkding/data"
-    ports:
-      - "${LINKD_HOST_PORT:-9090}:9090"
-    networks:
-      hyperion_net:
-
-#-------------------------#
-#-------- Tandoor --------#
-#-------------------------#
+# -------------------------------------------------
+# Tandoor: https://docs.tandoor.dev/install/docker/
+# -------------------------------------------------
 
   db_recipes:
     image: postgres:16-alpine
@@ -94,14 +67,13 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file:
-      - hyperion.env
+    env_file: hyperion.env
     environment:
       - POSTGRES_PASSWORD=${TANDOOR_POSTGRES_PASSWORD}
     volumes:
       - ./tandoor/postgresql:/var/lib/postgresql/data
     networks:
-      hyperion_net:
+      tandoor_net:
 
   web_recipes:
     image: vabene1111/recipes
@@ -116,8 +88,7 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file:
-      - hyperion.env
+    env_file: hyperion.env
     volumes:
       - ./tandoor/recipes:/opt/recipes/staticfiles
       - ./tandoor/mediafiles:/opt/recipes/mediafiles
@@ -125,7 +96,7 @@ services:
     depends_on:
       - db_recipes
     networks:
-      hyperion_net:
+      tandoor_net:
 
   nginx_recipes:
     image: nginx:mainline-alpine
@@ -140,8 +111,7 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file:
-      - hyperion.env
+    env_file: hyperion.env
     volumes:
       - ./tandoor/staticfiles:/static:ro
       - ./tandoor/mediafiles:/media:ro
@@ -151,11 +121,15 @@ services:
     ports:
       - 8086:80
     networks:
-      hyperion_net:
-
-networks:
-  hyperion_net:
-  linkwarden_net:
+      tandoor_net:
+      
+# ---------------------------------
 
 volumes:
   nginx_config:
+
+networks:
+  tandoor_net:
+    driver: bridge
+  linkwarden_net:
+    driver: bridge
