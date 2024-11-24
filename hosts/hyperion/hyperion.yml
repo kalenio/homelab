@@ -122,7 +122,7 @@ services:
       - 8086:80
     networks:
       tandoor_net:
-      
+
 # ---------------------------------
 
 volumes:
