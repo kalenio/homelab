@@ -20,8 +20,7 @@ services:
           cpus: '1'
           memory: 512M 
     user: "3000:3000" # Specify non-admin/root user and run container as that user
-    env_file: # Store sensitive info in an .env file instead of compose file
-      - foo.env
+    env_file: foo.env # Store sensitive info in an .env file instead of compose file
     volumes:
       - /path/to/data:/data:ro # Set volumes as read-only where possible
     expose:
