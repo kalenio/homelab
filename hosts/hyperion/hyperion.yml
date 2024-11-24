@@ -1,13 +1,51 @@
 services:
 
+  linkding:
+    container_name: "${LINKD_CONTAINER_NAME:-linkding}"
+    image: sissbruecker/linkding:"{LINKD_VERS:-latest-alpine}" # https://hub.docker.com/r/sissbruecker/linkding/tags
+    security_opt:
+      - no-new-privileges:true
+      - cap_drop=ALL
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    user: "3000:3000"
+    env_file:
+      - hyperion.env
+    volumes:
+      - "${LINKD_HOST_DATA_DIR:-./data}:/etc/linkding/data"
+    ports:
+      - "${LINKD_HOST_PORT:-9090}:9090"
+    networks:
+      hyperion_net:
+
+    
+#-------------------------#
+#-------- Tandoor --------#
+#-------------------------#
+
   db_recipes:
     image: postgres:16-alpine
     container_name: tandoor-db
     security_opt:
       - no-new-privileges:true
+      - cap_drop=ALL
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    user: "3000:3000"
     env_file:
-      - ./hyperion.env
+      - hyperion.env
     volumes:
       - ./tandoor/postgresql:/var/lib/postgresql/data
     networks:
@@ -18,9 +56,18 @@ services:
     container_name: tandoor
     security_opt:
       - no-new-privileges:true
+      - cap_drop=ALL
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    user: "3000:3000"
     env_file:
-      - ./hyperion.env
+      - hyperion.env
     volumes:
       - ./tandoor/recipes:/opt/recipes/staticfiles
       - ./tandoor/mediafiles:/opt/recipes/mediafiles
@@ -35,9 +82,18 @@ services:
     container_name: tandoor-nginx
     security_opt:
       - no-new-privileges:true
+      - cap_drop=ALL
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    user: "3000:3000"
     env_file:
-      - ./hyperion.env
+      - hyperion.env
     volumes:
       - ./tandoor/staticfiles:/static:ro
       - ./tandoor/mediafiles:/media:ro
