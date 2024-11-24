@@ -2,10 +2,11 @@ services:
 
   linkding:
     container_name: "${LINKD_CONTAINER_NAME:-linkding}"
-    image: sissbruecker/linkding:"${LINKD_VERS:-latest-alpine}" # https://hub.docker.com/r/sissbruecker/linkding/tags
+    image: sissbruecker/linkding:${LINKD_VERS:-latest-alpine} # https://hub.docker.com/r/sissbruecker/linkding/tags
     security_opt:
       - no-new-privileges:true
-      - cap_drop=ALL
+    cap_drop:
+      - ALL
     restart: unless-stopped
     tmpfs:
       - /tmp
@@ -33,7 +34,8 @@ services:
     container_name: tandoor-db
     security_opt:
       - no-new-privileges:true
-      - cap_drop=ALL
+    cap_drop:
+      - ALL
     restart: unless-stopped
     tmpfs:
       - /tmp
@@ -55,7 +57,8 @@ services:
     container_name: tandoor
     security_opt:
       - no-new-privileges:true
-      - cap_drop=ALL
+    cap_drop:
+      - ALL
     restart: unless-stopped
     tmpfs:
       - /tmp
@@ -81,7 +84,8 @@ services:
     container_name: tandoor-nginx
     security_opt:
       - no-new-privileges:true
-      - cap_drop=ALL
+    cap_drop:
+      - ALL
     restart: unless-stopped
     tmpfs:
       - /tmp
