@@ -20,9 +20,11 @@ services:
     env_file: hyperion.env
     volumes:
       - ./linkwarden/pgdata:/var/lib/postgresql/data
+    networks:
+      linkwarden_net:
 
   linkwarden:
-    image: ghcr.io/linkwarden/linkwarden:latest # comment this line to build from source
+    image: ghcr.io/linkwarden/linkwarden:latest
     container_name: linkwarden
     security_opt:
       - no-new-privileges:true
@@ -44,6 +46,8 @@ services:
       - 3000:3000
     depends_on:
       - postgres
+    networks:
+      linkwarden_net:
 
 #-------------------------#
 #------- Linkding --------#
@@ -147,6 +151,7 @@ services:
 
 networks:
   hyperion_net:
+  linkwarden_net:
 
 volumes:
   nginx_config:
