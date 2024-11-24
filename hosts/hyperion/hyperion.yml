@@ -24,7 +24,7 @@ services:
     networks:
       hyperion_net:
 
-    
+
 #-------------------------#
 #-------- Tandoor --------#
 #-------------------------#
@@ -104,7 +104,7 @@ services:
       - 8086:80
     networks:
       hyperion_net:
-      
+
 networks:
   hyperion_net:
 
