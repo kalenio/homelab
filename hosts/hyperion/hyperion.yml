@@ -1,8 +1,57 @@
 services:
 
+#-------------------------#
+#------ Linkwarden ------#
+#-------------------------#
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: linkwarden_db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    volumes:
+      - ./linkwarden/pgdata:/var/lib/postgresql/data
+
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest # comment this line to build from source
+    container_name: linkwarden
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file:
+      - hyperion.env
+    environment:
+      - DATABASE_URL=postgresql://postgres:${LINKW_POSTGRES_PASSWORD}@postgres:5432/postgres
+    volumes:
+      - ./linkwarden/data:/data/data
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+
+#-------------------------#
+#------- Linkding --------#
+#-------------------------#
+
   linkding:
-    container_name: "${LINKD_CONTAINER_NAME:-linkding}"
     image: sissbruecker/linkding:${LINKD_VERS:-latest-alpine} # https://hub.docker.com/r/sissbruecker/linkding/tags
+    container_name: "${LINKD_CONTAINER_NAME:-linkding}"
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
