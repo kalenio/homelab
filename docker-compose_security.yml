@@ -1,0 +1,31 @@
+# This is an template for optional docker-compose parameters to increase container security.
+
+services:
+
+  foo:
+    image: foo:1.36.0-alpine # Specify version
+    container_name: foo
+    security_opt:
+      - no-new-privileges:true # Prevent processes from gaining new privileges
+      - cap_drop=ALL # Drop all capabilities and add only necessary ones
+    restart: unless-stopped
+    tmpfs: # Mount tmpfs for temporary data
+      - /tmp
+    deploy: # Limit maximum system resources available to the container
+      resources: 
+        limits: 
+          cpus: '1'
+          memory: 512M 
+    user: "3000:3000" # Specify non-admin/root user and run container as that user
+    env_file: # Store sensitive info in an .env file instead of compose file
+      - foo.env
+    volumes:
+      - /path/to/data:/data:ro # Set volumes as read-only where possible
+    expose:
+      - "8080" # Use 'expose' (internal communication) rather than 'ports' (external communication) where possible
+    networks: # Define networks to limit unnecessary container communication channels 
+      secure_net:
+
+  networks:  
+    secure_net:
+      driver: bridge # Allows containers to communicate internally while isolating them from the host/external networks 
