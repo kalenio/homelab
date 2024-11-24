@@ -7,7 +7,8 @@ services:
     container_name: foo
     security_opt:
       - no-new-privileges:true # Prevent processes from gaining new privileges
-      - cap_drop=ALL # Drop all capabilities and add only necessary ones
+    cap_drop:
+      - ALL # Drop all capabilities and add only necessary ones
     read_only: true # Prevent container from writing anything to the host
     restart: unless-stopped
     tmpfs: # Mount /tmp as memory-backed instead of disk-backed
