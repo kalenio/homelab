@@ -53,7 +53,7 @@ services:
 # ConvertX: https://github.com/C4illin/ConvertX
 # ---------------------------------------------
 
-  convertx: 
+  convertx:
     image: ghcr.io/c4illin/convertx
     container_name: convertx
     security_opt:
