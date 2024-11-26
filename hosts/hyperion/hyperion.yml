@@ -1,5 +1,9 @@
 services:
 
+# -----------------------------------------------------------------
+# Linkwarden: https://docs.linkwarden.app/self-hosting/installation
+# -----------------------------------------------------------------
+
   postgres:
     image: postgres:16-alpine
     container_name: linkwarden_db
@@ -13,7 +17,7 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file: linkwarden.env
+    env_file: hyperion.env
     volumes:
       - ./linkwarden/pgdata:/var/lib/postgresql/data
     networks:
@@ -32,7 +36,7 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file: linkwarden.env
+    env_file: hyperion.env
     environment:
       # DATABASE_URL = engine://username:password@host:port/dbname.
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
@@ -45,6 +49,37 @@ services:
     networks:
       linkwarden_net:
 
+# ---------------------------------------------
+# ConvertX: https://github.com/C4illin/ConvertX
+# ---------------------------------------------
+
+  convertx: 
+    image: ghcr.io/c4illin/convertx
+    container_name: convertx
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    environment:
+      - JWT_SECRET=arPmaz5/${CONVERTX_JWT_SECRET} # will use randomUUID() if unset
+    volumes:
+      - ./convertx/data:/app/data
+    ports:
+      - "3003:3000"
+    networks:
+      convertx_net:
+
+# ---------------------------------------------
+
 networks:
   linkwarden_net:
+    driver: bridge
+  convertx_net:
     driver: bridge
