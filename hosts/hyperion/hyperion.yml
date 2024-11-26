@@ -68,11 +68,15 @@ services:
           memory: 512M
     env_file: hyperion.env
     environment:
-      - JWT_SECRET=arPmaz5/${CONVERTX_JWT_SECRET} # will use randomUUID() if unset
+      - JWT_SECRET=${CONVERTX_JWT_SECRET} # will use randomUUID() if unset
+      - HTTP_ALLOWED=false
+      - ALLOW_UNAUTHENTICATED=false
+      - AUTO_DELETE_EVERY_N_HOURS=24
+      - ACCOUNT_REGISTRATION=false
     volumes:
       - ./convertx/data:/app/data
     ports:
-      - "3003:3000"
+      - 3003:3000
     networks:
       convertx_net:
 
