@@ -19,8 +19,8 @@ services:
           memory: 512M
     env_file: hyperion.env
     environment:
-      # DATABASE_URL = engine://username:password@host:port/dbname. This connection string will override all other database settings.
-      - DATABASE_URL=postgresql://postgres:${LINKW_PG_PASSWORD}@postgres:5432/postgres
+      # DATABASE_URL = engine://username:password@host:port/dbname.
+      - DATABASE_URL=postgresql://postgres:${LINKW_DB_PASSWORD}@postgres:5432/postgres
     volumes:
       - ./linkwarden/data:/data/data
     ports:
@@ -45,7 +45,7 @@ services:
           memory: 512M
     env_file: hyperion.env
     environment:
-      - POSTGRES_PASSWORD=${LINKW_PG_PASSWORD}
+      - POSTGRES_PASSWORD=${LINKW_DB_PASSWORD}
     volumes:
       - ./linkwarden/pgdata:/var/lib/postgresql/data
     networks:
@@ -69,13 +69,6 @@ services:
           cpus: '1'
           memory: 512M
     env_file: hyperion.env
-    environment:
-      - DB_ENGINE=${TANDOOR_DB_ENGINE}
-      - POSTGRES_HOST=${TANDOOR_PG_HOST}
-      - POSTGRES_DB=${TANDOOR_PG_DB}
-      - POSTGRES_PORT=${TANDOOR_PG_PORT}
-      - POSTGRES_USER=${TANDOOR_PG_USER}
-      - POSTGRES_PASSWORD=${TANDOOR_PG_PASSWORD}
     volumes:
       - ./tandoor/postgresql:/var/lib/postgresql/data
     networks:
