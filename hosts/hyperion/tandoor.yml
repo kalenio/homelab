@@ -1,0 +1,75 @@
+services:
+
+  db_recipes:
+    image: postgres:16-alpine
+    container_name: tandoor-db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: tandoor.env
+    volumes:
+      - ./tandoor/postgresql:/var/lib/postgresql/data
+    networks:
+      tandoor_net:
+
+  web_recipes:
+    image: vabene1111/recipes
+    container_name: tandoor
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: tandoor.env
+    volumes:
+      - ./tandoor/recipes:/opt/recipes/staticfiles
+      - ./tandoor/mediafiles:/opt/recipes/mediafiles
+      - nginx_config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
+    depends_on:
+      - db_recipes
+    networks:
+      tandoor_net:
+
+  nginx_recipes:
+    image: nginx:mainline-alpine
+    container_name: tandoor-nginx
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: tandoor.env
+    volumes:
+      - ./tandoor/staticfiles:/static:ro
+      - ./tandoor/mediafiles:/media:ro
+      - nginx_config:/etc/nginx/conf.d:ro # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
+    depends_on:
+      - web_recipes
+    ports:
+      - 8086:80
+    networks:
+      tandoor_net:
+
+volumes:
+  nginx_config:
+
+networks:
+  tandoor_net:
+    driver: bridge
