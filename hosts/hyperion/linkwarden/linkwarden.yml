@@ -1,0 +1,50 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: linkwarden_db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: linkwarden.env
+    volumes:
+      - ./linkwarden/pgdata:/var/lib/postgresql/data
+    networks:
+      linkwarden_net:
+
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest
+    container_name: linkwarden
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: linkwarden.env
+    environment:
+      # DATABASE_URL = engine://username:password@host:port/dbname.
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    volumes:
+      - ./linkwarden/data:/data/data
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    networks:
+      linkwarden_net:
+
+networks:
+  linkwarden_net:
+    driver: bridge
