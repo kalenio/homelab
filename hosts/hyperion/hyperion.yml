@@ -117,3 +117,5 @@ networks:
     driver: bridge
   convertx_net:
     driver: bridge
+  audiobookshelf_net:
+    driver: bridge
