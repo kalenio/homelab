@@ -1,6 +1,36 @@
 services:
 
 # -----------------------------------------------------------------
+# Audiobookshelf: https://www.audiobookshelf.org/docs/#docker-compose-install
+# -----------------------------------------------------------------
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:${ABS_VERS:-latest}
+    container_name: audiobookshelf
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    environment:
+      - AUDIOBOOKSHELF_UID=${UID}
+      - AUDIOBOOKSHELF_GID=${GID}
+    volumes:
+      - ${ABS_ROOT_DIR}:/books
+      - ./audiobookshelf/metadata:/metadata
+      - ./audiobookshelf/config:/config
+    ports:
+      - 13378:80
+    networks:
+      audiobookshelf_net:
+
+# -----------------------------------------------------------------
 # Linkwarden: https://docs.linkwarden.app/self-hosting/installation
 # -----------------------------------------------------------------
 
