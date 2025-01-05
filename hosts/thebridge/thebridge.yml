@@ -137,7 +137,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DATABASE_NAME}
     volumes:
-      - ./postgres-db/data:/var/lib/postgresql/data
+      - ./speedtest-tracker/postgres-db/data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     networks:
