@@ -186,7 +186,7 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - ./prowlar/config:/config
+      - ./prowlarr/config:/config
       - ${MEDIA_ROOT_PATH}:/nebula-media
     depends_on:
       gluetun:
