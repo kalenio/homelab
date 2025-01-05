@@ -187,7 +187,6 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./prowlarr/config:/config
-      - ${MEDIA_ROOT_PATH}:/nebula-media
     depends_on:
       gluetun:
         condition: service_healthy
