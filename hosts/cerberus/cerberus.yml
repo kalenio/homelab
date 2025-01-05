@@ -2,6 +2,7 @@
 services:
   caddy:
     build: .
+    image: caddy-cloudflare:latest
     security_opt:
       - label:disable
       - no-new-privileges:true
