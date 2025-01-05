@@ -18,7 +18,7 @@ services:
       - 3000:3000
     networks:
       thebridge_net:
-      
+
   homeassistant:
     image: homeassistant/home-assistant:${HOMEASSISTANT_VER}
     container_name: homeassistant
@@ -166,7 +166,7 @@ services:
 # ----------------------------- #
 # ------- Notifications ------- #
 # ----------------------------- #
-      
+
   ntfy:
     image: binwiederhier/ntfy:${NTFY_VER}
     container_name: ntfy
