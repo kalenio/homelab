@@ -11,8 +11,8 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - homepage_config:/app/config
-      - homepage_images:/app/public/images
+      - ./homepage/config:/app/config
+      - ./homepage/images:/app/public/images
 #      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations. USE SOCKET PROXY INSTEAD: https://github.com/Tecnativa/docker-socket-proxy
     ports:
       - 3000:3000
@@ -115,8 +115,8 @@ services:
       - PRUNE_RESULTS_OLDER_THAN=365 # optional, days to keep test results
 #      - APP_DEBUG=true
     volumes:
-      - speedtest-tracker_config:/config
-      - speedtest-tracker_keys:/config/keys
+      - ./speedtest-tracker/config:/config
+      - ./speedtest-tracker/keys:/config/keys
     ports:
       - 8080:80 # web UI
       - 8443:443
@@ -137,7 +137,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DATABASE_NAME}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-db/data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     networks:
@@ -218,10 +218,4 @@ services:
 
 networks:
   thebridge_net:
-
-volumes:
-  homepage_config:
-  homepage_images:
-  speedtest-tracker_config:
-  speedtest-tracker_keys:
   postgres-data:
