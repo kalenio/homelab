@@ -3,7 +3,7 @@ services:
   caddy:
     build: .
     image: caddy-cloudflare:latest
-    container_name: caddy
+    container_name: caddy-cerberus
     security_opt:
       - label:disable
       - no-new-privileges:true
