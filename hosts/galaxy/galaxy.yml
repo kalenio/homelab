@@ -19,8 +19,8 @@ services:
       - /dev/nvidiactl
       - /dev/nvidia0
     volumes:
-      - jellyfin-config:/config
-      - jellyfin-cache:/cache
+      - ./jellyfin/config:/config
+      - ./jellyfin/cache:/cache
       - ${MEDIA_LIBRARY_PATH}:/media_library :ro
     ports:
       - 8096:8096/tcp # http webUI
@@ -40,11 +40,6 @@ services:
       - LOG_LEVEL=debug
       - TZ=${TIMEZONE}
     volumes:
-      - jellyseerr-config:/app/config
+      - ./jellyseerr/config:/app/config
     ports:
       - 5055:5055
-
-volumes:
-  jellyfin-config:
-  jellyfin-cache:
-  jellyseerr-config:
