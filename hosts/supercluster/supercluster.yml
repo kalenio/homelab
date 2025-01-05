@@ -95,7 +95,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-        
+
   ###### ----- Media Management ----- ######
 
   sonarr: # https://docs.linuxserver.io/images/docker-sonarr/?h=sonarr
