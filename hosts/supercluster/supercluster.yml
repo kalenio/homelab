@@ -73,7 +73,7 @@ services:
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
     volumes:
       - ./qbittorrent/config:/config
-      - ${TORRENTS_PATH}:/media/downloads/torrents:rw
+      - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
     depends_on:
       gluetun:
         condition: service_healthy
@@ -91,7 +91,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./sabnzbd/config:/config
-      - ${USENET_PATH}:/media/downloads/usenet:rw
+      - ${USENET_PATH}:/nebula-downloads/usenet:rw
     depends_on:
       gluetun:
         condition: service_healthy
@@ -111,8 +111,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./sonarr/config:/config
-      - ${DOWNLOADS_PATH}:/media/downloads
-      - ${SERIES_PATH}:/media/library/series
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${SERIES_PATH}:/nebula-media/series
     depends_on:
       gluetun:
         condition: service_healthy
@@ -130,8 +130,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./radarr/config:/config
-      - ${DOWNLOADS_PATH}:/media/downloads
-      - ${MOVIES_PATH}:/media/library/movies
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${MOVIES_PATH}:/nebula-media/movies
     depends_on:
       gluetun:
         condition: service_healthy
@@ -149,8 +149,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./lidarr/config:/config
-      - ${DOWNLOADS_PATH}:/media/downloads
-      - ${MUSIC_PATH}:/media/library/music
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${MUSIC_PATH}:/nebula-media/music
     depends_on:
       gluetun:
         condition: service_healthy
@@ -168,8 +168,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./readarr/config:/config
-      - ${DOWNLOADS_PATH}:/media/downloads
-      - ${BOOKS_PATH}:/media/library/books
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${BOOKS_PATH}:/mebula-media/books
     depends_on:
       gluetun:
         condition: service_healthy
@@ -187,7 +187,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./prowlar/config:/config
-      - ${MEDIA_ROOT_PATH}:/media
+      - ${MEDIA_ROOT_PATH}:/nebula-media
     depends_on:
       gluetun:
         condition: service_healthy
@@ -205,8 +205,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./bazarr/config:/config
-      - ${MOVIES_PATH}:/media/library/movies
-      - ${SERIES_PATH}:/media/library/series
+      - ${MOVIES_PATH}:/nebula-media/movies
+      - ${SERIES_PATH}:/nebula-media/series
     depends_on:
       gluetun:
         condition: service_healthy
