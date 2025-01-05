@@ -73,7 +73,7 @@ services:
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
     volumes:
       - ./qbittorrent/config:/config
-      - ${TORRENTS_PATH}:media/downloads/torrents:rw
+      - ${TORRENTS_PATH}:/media/downloads/torrents:rw
     depends_on:
       gluetun:
         condition: service_healthy
