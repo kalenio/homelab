@@ -23,7 +23,7 @@ services:
       - TZ=${TIMEZONE}
       - UPDATER_PERIOD=24h # Server list updater, see https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#update-the-vpn-servers-list
     volumes:
-      - gluetun:/gluetun
+      - ./gluetun:/gluetun
     ports:
       - 8000:8000 # gluetun HTTP control server / web UI
       - 8085:8085 # qbitorrent web ui
