@@ -56,7 +56,7 @@ services:
       ND_SCANSCHEDULE: 1h
       ND_LOGLEVEL: info
       ND_SESSIONTIMEOUT: 24h
-      ND_BASEURL: "${NAVIDROME_URL}"
+      ND_BASEURL: ""
     volumes:
       - ./navidrome/data:/data
       - ${MUSIC_PATH}:/music:ro
