@@ -1,0 +1,20 @@
+{
+  "name": "jukebox",
+  "any": [
+   { "all": [
+      {"is": {"rating": "3"}},
+      {"notInTheLast": {"lastPlayed": 150}}
+   ]},
+   { "all": [
+      {"is": {"rating": "4"}},
+      {"notInTheLast": {"lastPlayed": 90}}
+   ]},
+   { "all": [
+      {"is": {"rating": "5"}},
+      {"notInTheLast": {"lastPlayed": 40}}
+   ]}
+  ],  
+  "sort": "lastPlayed",
+  "order": "desc",
+  "limit": 500
+}
