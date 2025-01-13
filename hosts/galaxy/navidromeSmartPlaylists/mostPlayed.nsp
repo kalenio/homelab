@@ -1,0 +1,9 @@
+{
+  "name": "mostPlayed🔥",
+  "all": [ 
+   {"gt": {"playcount": 0}} 
+  ], 
+  "sort": "playcount", 
+  "order": "desc", 
+  "limit": 100 
+}
