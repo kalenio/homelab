@@ -1,0 +1,8 @@
+{
+  "name": "unrated",
+  "all": [
+    {"is": {"rating": 0}}
+  ],
+  "sort": "album",
+  "order": "desc"
+}
