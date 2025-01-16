@@ -15,8 +15,8 @@ services:
     tmpfs: # Mount /tmp as memory-backed instead of disk-backed
       - /tmp
     deploy: # Limit maximum system resources available to the container
-      resources: 
-        limits: 
+      resources:
+        limits:
           cpus: '1'
           memory: 512M 
     user: "3000:3000" # Specify non-admin/root user and run container as that user
@@ -28,6 +28,6 @@ services:
     networks: # Define networks to limit unnecessary container communication channels 
       secure_net:
 
-  networks:  
+  networks:
     secure_net:
       driver: bridge # Allows containers to communicate internally while isolating them from the host/external networks 
