@@ -74,8 +74,7 @@ services:
     volumes:
       - ./qbittorrent/config:/config
       - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
-      - ${TORRENTS_PATH}/mam.cookies/mam-seedbox.service:/etc/systemd/system/mam-seedbox.service # For MyAnonaMouse dynamic IP update
-      - ${TORRENTS_PATH}/mam.cookies/mam-seedbox.timer:/etc/systemd/system/mam-seedbox.timer # For MyAnonaMouse dynamic IP update
+      - ${TORRENTS_PATH}/mam.cookies:/mam.cookies # For MyAnonaMouse dynamic IP update
     depends_on:
       gluetun:
         condition: service_healthy
