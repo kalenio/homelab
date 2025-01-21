@@ -1,0 +1,51 @@
+# This is a template for docker-compose best practices, with a focus on increasing container security.
+# Use with discretion, as not all parameters will work with all containers, and containers tend to get grumpy when you bubble-wrap them.
+# Some paramaters use environment variables and assume they are defined in foo.env
+
+services:
+
+  foo:
+    image: foo:${FOO_VERS:-latest} # Specify a container version via .env variable FOO_VERS with a fallback (latest).
+    container_name: foo # Set container name as it is identified by Docker on the host machine.
+    hostname: foo # Set container's internal hostname via /etc/hostname file and makes it the container’s local network name.
+    security_opt:
+      - no-new-privileges:true # Prevent processes from gaining new privileges.
+    cap_drop:
+      - ALL # Drop all capabilities and add only necessary ones.
+    cap_add:
+      - SYS_ADMIN # Needed capabilities go here.
+    read_only: true # Prevent container from writing anything to the host. Since this is set at the service-level, it overwrites anything set at the volume-level.
+    restart: unless-stopped
+    tmpfs: # Temporary filesystem, mounts /tmp as memory-backed instead of disk-backed. Increase I/O performance, reduces disk wear, and increases security by
+           # isolating the container's temporary data from the host's filesystem.
+      - /tmp
+    deploy: # Limit maximum system resources available to the container
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M 
+    user: "${UID}:${GID}" # Specify non-admin/root user and run container as that user
+    environment:
+      - PUID=${UID} # Some containers require that user/group are specified as environment variables instead.
+      - PGUID${GID} # ^
+      - TZ=${TIMEZONE:-Etc/UTC}
+    env_file: foo.env # Store sensitive info in an .env file and use variables in the compose file instead.
+    volumes:
+      - /path/to/data:/data:ro # Set volumes as read-only where possible
+      - /path/to/config:/config:rw # By default, volumes are read-write, but the parameter can be specified explicitly for clarity/consistency.
+    expose:
+      - "8080" # Makes a container's internal port available to other containers within the same Docker network, but it does not expose the
+               # port to the host machine or external network. More secure than "ports" and should be used instead where possible.
+    ports: # Expose external ports on the container host and connect them to interal container ports. ***Will likely bypass firewall rules such as UFW.
+      - "5811:5800" # host_port:container_port
+      - "3000:3000/udp" # Specify a port protocol
+      - "127.0.0.1:8080:80"  # Only accessible from localhost
+      - "0.0.0.0:8080:80"    # Accessible from all network interfaces
+      - "8080"  # Docker will automatically bind to a random available port on the host. 
+                # Useful when you don't care about the specific port number on the host but still need the container’s internal port exposed.
+    networks: # Define networks to limit unnecessary container communication channels 
+      foo-net:
+
+  networks:
+    foo-net:
+      driver: bridge # Allows containers to communicate internally while isolating them from the host/external networks 
