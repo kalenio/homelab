@@ -47,7 +47,7 @@ services:
   navidrome: # https://www.navidrome.org/docs/installation/docker/
     image: deluan/navidrome:${NAVIDROME_VERSION}
     container_name: navidrome
-    user: 3000:3000 # should be owner of volumes
+    user: "${UID}:${GID}" # should be owner of volumes
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
