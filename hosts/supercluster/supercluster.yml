@@ -15,11 +15,15 @@ services:
     environment:
       - PUID=${UID}
       - PGID=${GID}
-      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER} # mullvad setup: https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/mullvad.md
-      - VPN_TYPE=${VPN_TYPE}
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESS} # 10.68.243.38/32 for mullvad
-      - OWNED_ONLY=yes # If the vpn server is owned by mullvad. default is no, which includes all servers
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - PORT_FORWARD_ONLY=true
+      - VPN_PORT_FORWARDING=on
+      # - VPN_TYPE=${VPN_TYPE}
+      # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      # - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESS} # 10.68.243.38/32 for mullvad
+      # - OWNED_ONLY=yes # If the vpn server is owned by mullvad. default is no, which includes all servers
       - TZ=${TIMEZONE}
       - UPDATER_PERIOD=24h # Server list updater, see https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#update-the-vpn-servers-list
     volumes:
@@ -65,12 +69,15 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     network_mode: service:gluetun
+    DOCKER_MODS: ghcr.io/t-anc/gsp-qbittorent-gluetun-sync-port-mod:main
     environment:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8085
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
+      - GSP_QBT_USERNAME=${GSP_QBT_USERNAME}
+      - GSP_QBT_PASSWORD=${GSP_QBT_PASSWORD}
     volumes:
       - ./qbittorrent/config:/config
       - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
