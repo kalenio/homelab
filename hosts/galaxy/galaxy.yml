@@ -21,7 +21,8 @@ services:
     volumes:
       - ./jellyfin/config:/config
       - ./jellyfin/cache:/cache
-      - ${MEDIA_LIBRARY_PATH}:/media_library :ro
+      - ${SERIES_PATH}:/media-library/series:ro
+      - ${MOVIES_PATH}:/media-library/movies:ro
     ports:
       - 8096:8096/tcp # http webUI
       - 8920:8920/tcp # https webUI
