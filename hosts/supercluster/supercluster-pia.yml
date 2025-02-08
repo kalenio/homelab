@@ -1,0 +1,237 @@
+services:
+
+  ###### ----- Network ----- ######
+
+vpn:
+    image: thrnz/docker-wireguard-pia:laatest # https://github.com/thrnz/docker-wireguard-pia
+    container_name: docker-wireguard-pia
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - LOC=swiss
+      - USER=${PIA_USER}
+      - PASS={PIA_PASSWORD}
+      - PORT_FORWARDING=1
+      - PORT_PERSIST=1 # Set to 1 to attempt to keep the same port forwarded when the container is restarted.
+      - PORT_FILE=/pia-shared/forwarded_port.txt # The forwarded port number is dumped here for possible access by scripts in other containers. By default this is /pia-shared/port.dat.
+      - KEEPALIVE=25 # This can be used to ensure incoming packets on an idle link aren't lost when behind NAT.
+    volumes:
+      # Auth token is stored here
+      - ./pia:/pia
+      # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
+      - ./pia/shared:/pia-shared
+    sysctls:
+      # The wg-quick script tries to set this when setting up routing, however this requires running the container
+      # with the --privileged flag set. Setting it here instead if needed means the container can be run with lower
+      # privileges. This only needs setting if strict reverse path filtering (rp_filter=1) is used.
+      #- net.ipv4.conf.all.src_valid_mark=1
+      # May as well disable ipv6. Should be blocked anyway.
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
+    ports:
+      - 8085:8085 # qbitorrent web ui
+      #- 6881:6881 # qbittorrent incoming connections port (downloads/uploads)
+      #- 6881:6881/udp # qbittorrent UDP incoming connections port
+      - 8989:8989 # sonarr web ui
+      - 7878:7878 # radarr web ui
+      - 8686:8686 # lidarr web ui
+      - 8787:8787 # readarr web ui
+      - 9696:9696 # prowlarr web ui
+      - 6767:6767 # bazarr web ui
+      - 8191:8191 # flaresolverr
+      #- 8080:8080 # sabnzbd web ui. check sabnzbd.ini if running into issues. may be 8085 by default?
+      #- 563:563/tcp # sabnzbd SSL News Transfer Protocol port
+      #- 119:119/tcp # sabnzbd News Transfer Protocol port
+
+qbportforward:
+    image: charlocharlie/qbittorrent-port-forward-file:latest # https://hub.docker.com/r/charlocharlie/qbittorrent-port-forward-file
+    container_name: qbittorrent-port-forward-file
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - QBT_USERNAME:${QBT_USERNAME}
+      - QBT_PASSWORD:${QBT_PASSWORD}
+      - QBT_ADDR:${QBT_ADDR}
+      - PORT_FILE:/config/forwarded_port.txt
+    volumes:
+      - ./pia/shared:/config:ro
+
+  flaresolverr:
+    image: flaresolverr/flaresolverr:${FLARESOLVERR_VERSION}
+    container_name: flaresolverr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=${TIMEZONE}
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+  qbittorrent: # https://docs.linuxserver.io/images/docker-qbittorrent/
+    image: lscr.io/linuxserver/qbittorrent:${QBITTORRENT_VERSION}
+    container_name: qbittorrent
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - WEBUI_PORT=8085
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest|ghcr.io/t-anc/gsp-qbittorent-gluetun-sync-port-mod:main # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
+      - GSP_QBT_USERNAME=${GSP_QBT_USERNAME}
+      - GSP_QBT_PASSWORD=${GSP_QBT_PASSWORD}
+    volumes:
+      - ./qbittorrent/config:/config
+      - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
+      - ${TORRENTS_PATH}/mam.cookies:/mam.cookies # For MyAnonaMouse dynamic IP update
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+ # sabnzbd: # https://docs.linuxserver.io/images/docker-sabnzbd/#usage
+ #   image: lscr.io/linuxserver/sabnzbd:${SABNZBD_VERSION}
+ #   container_name: sabnzbd
+ #   security_opt:
+ #     - no-new-privileges:true
+ #   restart: unless-stopped
+ #   network_mode: "service:vpn"
+ #   environment:
+ #     - PUID=${UID}
+ #     - PGID=${GID}
+ #     - TZ=${TIMEZONE}
+ #   volumes:
+ #     - ./sabnzbd/config:/config
+ #     - ${USENET_PATH}:/nebula-downloads/usenet:rw
+ #   depends_on:
+ #     vpn:
+ #       condition: service_healthy
+
+  ###### ----- Media Management ----- ######
+
+  sonarr: # https://docs.linuxserver.io/images/docker-sonarr/?h=sonarr
+    image: lscr.io/linuxserver/sonarr:${SONARR_VERSION}
+    container_name: sonarr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./sonarr/config:/config
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${SERIES_PATH}:/nebula-media/series
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+  radarr: # https://docs.linuxserver.io/images/docker-radarr/#media-folders
+    image: lscr.io/linuxserver/radarr:${RADARR_VERSION}
+    container_name: radarr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./radarr/config:/config
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${MOVIES_PATH}:/nebula-media/movies
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+  lidarr: # https://docs.linuxserver.io/images/docker-lidarr/#media-folders
+    image: lscr.io/linuxserver/lidarr:${LIDARR_VERSION}
+    container_name: lidarr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./lidarr/config:/config
+      - ${DOWNLOADS_PATH}:/nebula-downloads
+      - ${MUSIC_PATH}:/nebula-media/music
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+ # readarr:
+ #   image: lscr.io/linuxserver/readarr:${READARR_VERSION}
+ #   container_name: readarr
+ #   security_opt:
+ #     - no-new-privileges:true
+ #   restart: unless-stopped
+ #   network_mode: "service:vpn"
+ #   environment:
+ #     - PUID=${UID}
+ #     - PGID=${GID}
+ #     - TZ=${TIMEZONE}
+ #   volumes:
+ #     - ./readarr/config:/config
+ #     - ${DOWNLOADS_PATH}:/nebula-downloads
+ #     - ${BOOKS_PATH}:/mebula-media/books
+ #   depends_on:
+ #     vpn:
+ #       condition: service_healthy
+
+  prowlarr: # https://docs.linuxserver.io/images/docker-prowlarr/
+    image: lscr.io/linuxserver/prowlarr:${PROWLARR_VERSION}
+    container_name: prowlarr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./prowlarr/config:/config
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:${BAZARR_VERSION}
+    container_name: bazarr
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./bazarr/config:/config
+      - ${MOVIES_PATH}:/nebula-media/movies
+      - ${SERIES_PATH}:/nebula-media/series
+    depends_on:
+      vpn:
+        condition: service_healthy
