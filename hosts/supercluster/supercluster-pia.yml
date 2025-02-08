@@ -94,8 +94,6 @@ qbportforward:
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8085
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest|ghcr.io/t-anc/gsp-qbittorent-gluetun-sync-port-mod:main # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
-      - GSP_QBT_USERNAME=${GSP_QBT_USERNAME}
-      - GSP_QBT_PASSWORD=${GSP_QBT_PASSWORD}
     volumes:
       - ./qbittorrent/config:/config
       - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
