@@ -3,7 +3,7 @@ services:
   ###### ----- Network ----- ######
 
   vpn:
-    image: thrnz/docker-wireguard-pia:laatest # https://github.com/thrnz/docker-wireguard-pia
+    image: thrnz/docker-wireguard-pia:latest # https://github.com/thrnz/docker-wireguard-pia
     container_name: docker-wireguard-pia
     security_opt:
       - no-new-privileges:true
