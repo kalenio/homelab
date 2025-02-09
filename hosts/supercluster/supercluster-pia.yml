@@ -46,8 +46,8 @@ services:
     restart: unless-stopped
     network_mode: "service:vpn"
     environment:
-      - QBT_USERNAME:${QBT_USERNAME}
-      - QBT_PASSWORD:${QBT_PASSWORD}
+      - QBT_USERNAME:${QBT_USERNAME} # I could not get authentication to work properly without "bypassing authentication for clients on
+      - QBT_PASSWORD:${QBT_PASSWORD} # localhost" in qb settings, and i suspect it is due to the vuetorrent alternate web UI.
       - QBT_ADDR:${QBT_ADDR}
       - PORT_FILE:/config/forwarded_port.txt
     volumes:
