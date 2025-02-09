@@ -3,58 +3,47 @@ services:
   ###### ----- Network ----- ######
 
   vpn:
-    image: thrnz/docker-wireguard-pia:latest # https://github.com/thrnz/docker-wireguard-pia
+    image: thrnz/docker-wireguard-pia:${VPN_VERS:-latest} # https://github.com/thrnz/docker-wireguard-pia
     container_name: docker-wireguard-pia
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
+      - SYS_MODULE
     devices:
       - /dev/net/tun:/dev/net/tun
+    sysctls:
+      # May as well disable ipv6. Should be blocked anyway.
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
     environment:
       - LOC=swiss
       - USER=${PIA_USER}
-      - PASS={PIA_PASSWORD}
+      - PASS=${PIA_PASSWORD}
       - PORT_FORWARDING=1
       - PORT_PERSIST=1 # Set to 1 to attempt to keep the same port forwarded when the container is restarted.
       - PORT_FILE=/pia-shared/forwarded_port.txt # The forwarded port number is dumped here for possible access by scripts in other containers. By default this is /pia-shared/port.dat.
       - KEEPALIVE=25 # This can be used to ensure incoming packets on an idle link aren't lost when behind NAT.
     volumes:
-      # Auth token is stored here
-      - ./pia:/pia
-      # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
-      - ./pia/shared:/pia-shared
-    sysctls:
-      # The wg-quick script tries to set this when setting up routing, however this requires running the container
-      # with the --privileged flag set. Setting it here instead if needed means the container can be run with lower
-      # privileges. This only needs setting if strict reverse path filtering (rp_filter=1) is used.
-      #- net.ipv4.conf.all.src_valid_mark=1
-      # May as well disable ipv6. Should be blocked anyway.
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
+      - ./pia:/pia # Auth token is stored here
+      - ./pia/shared:/pia-shared # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
     ports:
-      - 8085:8085 # qbitorrent web ui
-      #- 6881:6881 # qbittorrent incoming connections port (downloads/uploads)
-      #- 6881:6881/udp # qbittorrent UDP incoming connections port
+      - 8085:8085/tcp # qbitorrent web ui
       - 8989:8989 # sonarr web ui
       - 7878:7878 # radarr web ui
-      - 8686:8686 # lidarr web ui
-      - 8787:8787 # readarr web ui
       - 9696:9696 # prowlarr web ui
       - 6767:6767 # bazarr web ui
       - 8191:8191 # flaresolverr
-      #- 8080:8080 # sabnzbd web ui. check sabnzbd.ini if running into issues. may be 8085 by default?
-      #- 563:563/tcp # sabnzbd SSL News Transfer Protocol port
-      #- 119:119/tcp # sabnzbd News Transfer Protocol port
 
-  qbportforward:
-    image: charlocharlie/qbittorrent-port-forward-file:latest # https://hub.docker.com/r/charlocharlie/qbittorrent-port-forward-file
-    container_name: qbittorrent-port-forward-file
+  qb-port:
+    image: charlocharlie/qbittorrent-port-forward-file:${QBPORT_VERS:-latest} # https://hub.docker.com/r/charlocharlie/qbittorrent-port-forward-file
+    container_name: qb-port
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+   # network_mode: "service:vpn"
     environment:
       - QBT_USERNAME:${QBT_USERNAME}
       - QBT_PASSWORD:${QBT_PASSWORD}
@@ -102,24 +91,6 @@ services:
       vpn:
         condition: service_healthy
 
- # sabnzbd: # https://docs.linuxserver.io/images/docker-sabnzbd/#usage
- #   image: lscr.io/linuxserver/sabnzbd:${SABNZBD_VERSION}
- #   container_name: sabnzbd
- #   security_opt:
- #     - no-new-privileges:true
- #   restart: unless-stopped
- #   network_mode: "service:vpn"
- #   environment:
- #     - PUID=${UID}
- #     - PGID=${GID}
- #     - TZ=${TIMEZONE}
- #   volumes:
- #     - ./sabnzbd/config:/config
- #     - ${USENET_PATH}:/nebula-downloads/usenet:rw
- #   depends_on:
- #     vpn:
- #       condition: service_healthy
-
   ###### ----- Media Management ----- ######
 
   sonarr: # https://docs.linuxserver.io/images/docker-sonarr/?h=sonarr
@@ -159,44 +130,6 @@ services:
     depends_on:
       vpn:
         condition: service_healthy
-
-  lidarr: # https://docs.linuxserver.io/images/docker-lidarr/#media-folders
-    image: lscr.io/linuxserver/lidarr:${LIDARR_VERSION}
-    container_name: lidarr
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    network_mode: "service:vpn"
-    environment:
-      - PUID=${UID}
-      - PGID=${GID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - ./lidarr/config:/config
-      - ${DOWNLOADS_PATH}:/nebula-downloads
-      - ${MUSIC_PATH}:/nebula-media/music
-    depends_on:
-      vpn:
-        condition: service_healthy
-
- # readarr:
- #   image: lscr.io/linuxserver/readarr:${READARR_VERSION}
- #   container_name: readarr
- #   security_opt:
- #     - no-new-privileges:true
- #   restart: unless-stopped
- #   network_mode: "service:vpn"
- #   environment:
- #     - PUID=${UID}
- #     - PGID=${GID}
- #     - TZ=${TIMEZONE}
- #   volumes:
- #     - ./readarr/config:/config
- #     - ${DOWNLOADS_PATH}:/nebula-downloads
- #     - ${BOOKS_PATH}:/mebula-media/books
- #   depends_on:
- #     vpn:
- #       condition: service_healthy
 
   prowlarr: # https://docs.linuxserver.io/images/docker-prowlarr/
     image: lscr.io/linuxserver/prowlarr:${PROWLARR_VERSION}
