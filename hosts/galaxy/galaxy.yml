@@ -26,6 +26,8 @@ services:
     ports:
       - 8096:8096/tcp # http webUI
       - 8920:8920/tcp # https webUI
+    networks:
+      jelly_net:
 
   jellyseerr:
     image: fallenbagel/jellyseerr:${JELLYSEERR_VERSION}
@@ -44,6 +46,9 @@ services:
       - ./jellyseerr/config:/app/config
     ports:
       - 5055:5055
+    networks:
+      jelly_net:
+    
 
   navidrome: # https://www.navidrome.org/docs/installation/docker/
     image: deluan/navidrome:${NAVIDROME_VERSION}
@@ -66,3 +71,41 @@ services:
       - ${MUSIC_PATH}:/music:ro
     ports:
       - "4533:4533"
+    networks:
+      navidrome_net:
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:${ABS_VERS:-latest}
+    container_name: audiobookshelf
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    environment:
+      - AUDIOBOOKSHELF_UID=${UID}
+      - AUDIOBOOKSHELF_GID=${GID}
+    volumes:
+      - ${BOOKS_PATH}:/books
+      - ./audiobookshelf/metadata:/metadata
+      - ./audiobookshelf/config:/config
+    ports:
+      - 13378:80
+    networks:
+      audiobookshelf_net:
+
+# ---------------------------------------------
+
+networks:
+  jelly_net:
+    driver: bridge
+  navidrome_net:
+    driver: bridge
+  audiobookshelf_net:
+    driver: bridge
