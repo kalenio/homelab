@@ -73,6 +73,10 @@ services:
     networks:
       navidrome_net:
 
+# -----------------------------------------------------------------
+# Audiobookshelf: https://www.audiobookshelf.org/docs/#docker-compose-install
+# -----------------------------------------------------------------
+
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:${ABS_VERS:-latest}
     container_name: audiobookshelf
