@@ -48,7 +48,6 @@ services:
       - 5055:5055
     networks:
       jelly_net:
-    
 
   navidrome: # https://www.navidrome.org/docs/installation/docker/
     image: deluan/navidrome:${NAVIDROME_VERSION}
