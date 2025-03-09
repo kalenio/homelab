@@ -86,7 +86,7 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file: hyperion.env
+    env_file: galaxy.env
     environment:
       - AUDIOBOOKSHELF_UID=${UID}
       - AUDIOBOOKSHELF_GID=${GID}
