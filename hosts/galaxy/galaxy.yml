@@ -1,5 +1,9 @@
 services:
 
+# -----------------------------------------------------------------
+# Jellyfin:
+# -----------------------------------------------------------------
+
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERSION} # OR jellyfin/jellyfin (official)
     container_name: jellyfin
@@ -29,6 +33,10 @@ services:
     networks:
       jelly_net:
 
+# -----------------------------------------------------------------
+# Jellyseerr:
+# -----------------------------------------------------------------
+
   jellyseerr:
     image: fallenbagel/jellyseerr:${JELLYSEERR_VERSION}
     container_name: jellyseerr
@@ -48,6 +56,10 @@ services:
       - 5055:5055
     networks:
       jelly_net:
+
+# -----------------------------------------------------------------
+# Navidrome:
+# -----------------------------------------------------------------
 
   navidrome: # https://www.navidrome.org/docs/installation/docker/
     image: deluan/navidrome:${NAVIDROME_VERSION}
