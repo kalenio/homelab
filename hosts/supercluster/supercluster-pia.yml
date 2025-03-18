@@ -14,7 +14,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 128M
+          memory: 64M
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -57,7 +57,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 128M
+          memory: 64M
     network_mode: "service:vpn"
     environment:
       - QBT_USERNAME:${QBT_USERNAME} # I could not get authentication to work properly without "bypassing authentication for clients on
@@ -210,7 +210,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 256M
+          memory: 512M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
