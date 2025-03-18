@@ -8,6 +8,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 128M
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -44,6 +51,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 128M
     network_mode: "service:vpn"
     environment:
       - QBT_USERNAME:${QBT_USERNAME} # I could not get authentication to work properly without "bypassing authentication for clients on
@@ -59,6 +73,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
@@ -77,6 +98,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8192M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
@@ -100,6 +128,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2048M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
@@ -119,6 +154,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
@@ -138,6 +180,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
@@ -155,6 +204,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 256M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
