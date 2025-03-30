@@ -77,8 +77,14 @@ services:
       ND_LASTFM_ENABLED: true
       ND_LASTFM_APIKEY: ${LASTFM_API_KEY}
       ND_LASTFM_SECRET: ${LASTFM_SHARED_SECRET}
+      # https://www.navidrome.org/docs/usage/backup/ Note: The optional backup process ONLY backs up the database (users, play counts, etc.).
+      # It does NOT back up music files or the config.
+      ND_BACKUP_PATH: /backup 
+      ND_BACKUP_SCHEDULE: "0 0 * * *" # every 24 hours at 12am
+      ND_BACKUP_COUNT: 7
     volumes:
       - ./navidrome/data:/data
+      - ./navidrome/backup:/backup
       - ${MUSIC_PATH}:/music:ro
     ports:
       - "4533:4533"
