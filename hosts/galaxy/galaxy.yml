@@ -84,7 +84,7 @@ services:
       ND_BACKUP_COUNT: 7
     volumes:
       - ./navidrome/data:/data
-      - ./navidrome/backup:/backup
+      - ./navidrome/backups:/backups
       - ${MUSIC_PATH}:/music:ro
     ports:
       - "4533:4533"
