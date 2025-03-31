@@ -85,7 +85,6 @@ services:
     volumes:
       - ./navidrome/data:/data
       - ./navidrome/backups:/backups
-      - ./navidrome/backups/playlists:/backups/playlists
       - ${MUSIC_PATH}:/music:ro
     ports:
       - "4533:4533"
