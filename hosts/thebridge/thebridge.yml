@@ -149,8 +149,9 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
-    user: "${UID}:${GID}"
     environment:
+      - PUID=3000
+      - GUID=3000
       - TZ=${TIMEZONE}
     volumes:
       - ./uptime-kuma/data:/data
