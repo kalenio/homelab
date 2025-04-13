@@ -143,24 +143,21 @@ services:
     networks:
       thebridge_net:
 
-
-# image does not yet support running as non-root user. https://github.com/louislam/uptime-kuma/pull/2086
-
-#  uptime-kuma:
-#    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
-#    container_name: uptime-kuma
-#    security_opt:
-#      - no-new-privileges:true
-#    restart: unless-stopped
-#    user: "${UID}:${GID}"
-#    environment:
-#      - TZ=${TIMEZONE}
-#    volumes:
-#      - ./uptime-kuma/data:/data
-#    ports:
-#      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
-#    networks:
-#      thebridge_net:
+  uptime-kuma:
+    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
+    container_name: uptime-kuma
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    user: "${UID}:${GID}"
+    environment:
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./uptime-kuma/data:/data
+    ports:
+      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
+    networks:
+      thebridge_net:
 
 
 # ----------------------------- #
