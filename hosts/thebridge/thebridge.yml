@@ -10,6 +10,7 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_DOMAIN}
     volumes:
       - ./homepage/config:/app/config
       - ./homepage/images:/app/public/images
