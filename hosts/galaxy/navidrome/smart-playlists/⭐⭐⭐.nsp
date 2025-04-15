@@ -1,0 +1,11 @@
+{
+  "name": "⭐⭐⭐",
+  "comment": "Songs with a three-star rating not in the 'instrumental' playlist",
+  "all": [
+    {"is": {"rating": 3}},
+    {"notInPlaylist": {"id": "24d9bf15-0c9d-4a78-bbbd-df2a7c82b047"}}
+  ],
+  "sort": "dateadded",
+  "order": "desc",
+  "limit": 5000
+}
