@@ -1,0 +1,10 @@
+{
+  "name": "bestOfInstrumental",
+  "comment": "Songs with a four-star or higher rating in the 'instrumental' playlist",
+  "all": [
+    {"gt": {"rating": 3}},
+    {"inPlaylist": {"id": "24d9bf15-0c9d-4a78-bbbd-df2a7c82b047"}}
+  ],
+  "sort": "dateadded",
+  "order": "desc",
+}
