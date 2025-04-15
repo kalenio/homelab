@@ -1,5 +1,5 @@
 {
-  "name": "bestOfInstrumental",
+  "name": "bestOfInstrumental🎻",
   "comment": "Songs with a four-star or higher rating in the 'instrumental' playlist",
   "all": [
     {"gt": {"rating": 3}},
