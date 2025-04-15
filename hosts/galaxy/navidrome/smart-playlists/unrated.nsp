@@ -1,0 +1,9 @@
+{
+  "name": "unrated",
+  "comment": "Songs that need to be rated",
+  "all": [
+    {"is": {"rating": 0}}
+  ],
+  "sort": "dateadded",
+  "order": "desc"
+}
