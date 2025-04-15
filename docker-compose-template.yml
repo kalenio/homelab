@@ -1,8 +1,12 @@
-# This is a template for docker-compose best practices, with a focus on increasing container security.
-# Use with discretion, as not all parameters will work with all containers, and containers tend to get grumpy when you bubble-wrap them.
-# Some paramaters use environment variables and assume they are defined in foo.env
+# This is a template of docker-compose formatting preferences and best practices, with a focus on container security.
+# Use with discretion, as not all parameters will work with all containers, and containers often get grumpy when you bubble-wrap them.
+# Some paramaters use environment variables and assume they are defined in foo.env.
 
 services:
+
+# -------------------------------------------------------- #
+# Monitoring
+# -------------------------------------------------------- #
 
   foo:
     image: foo:${FOO_VERS:-latest} # Specify a container version via .env variable FOO_VERS with a fallback (latest).
@@ -44,8 +48,33 @@ services:
       - "8080"  # Docker will automatically bind to a random available port on the host. 
                 # Useful when you don't care about the specific port number on the host but still need the container’s internal port exposed.
     networks: # Define networks to limit unnecessary container communication channels 
-      foo-net:
+      wizard-net:
 
-  networks:
-    foo-net:
-      driver: bridge # Allows containers to communicate internally while isolating them from the host/external networks 
+# -------------------------------------------------------- #
+# Pondering
+# -------------------------------------------------------- #
+
+  orb:
+    image: archmage/orb:${ORB_VERSION}
+    container_name: orb
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=debug
+    volumes:
+      - orb-config:/var/lib/backup/data  # This is a docker volume (vs. a bind mount), which is persistent container storage managed by docker
+    networks:
+      orb-net:
+
+# -------------------------------------------------------- #
+# -------------------------------------------------------- #
+
+volumes:
+  orb-config:
+
+networks:
+  wizard-net:
+    driver: bridge # Allows containers to communicate internally while isolating them from the host/external networks 
+  orb-net:
+    driver: host # The container's network stack isn't isolated from the Docker host (the container shares the host's networking namespace).
