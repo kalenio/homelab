@@ -1,9 +1,10 @@
 {
-  "name": "Favorites💖",
+  "name": "favorites💖",
   "comment": "Favorited songs",
   "all": [
     {"is": {"loved": true}}
   ],
   "sort": "dateLoved",
   "order": "desc",
+  "limit": 5000
 }
