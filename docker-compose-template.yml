@@ -5,7 +5,7 @@
 services:
 
 # -------------------------------------------------------- #
-# Monitoring
+# foo: https://www.foo.org/docs/#docker-compose-install
 # -------------------------------------------------------- #
 
   foo:
@@ -51,7 +51,7 @@ services:
       wizard-net:
 
 # -------------------------------------------------------- #
-# Pondering
+# Pondering: https://guidetopondering.blogspot.com/docker
 # -------------------------------------------------------- #
 
   orb:
