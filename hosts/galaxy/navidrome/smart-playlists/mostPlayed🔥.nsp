@@ -1,0 +1,10 @@
+{
+  "name": "mostPlayed🔥",
+  "comment": "Top 100 most played songs",
+  "all": [ 
+   {"gt": {"playcount": 0}} 
+  ], 
+  "sort": "playcount", 
+  "order": "desc", 
+  "limit": 100 
+}
