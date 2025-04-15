@@ -1,0 +1,11 @@
+{
+  "name": "bestOfChill☁️",
+  "comment": "Songs with a four-star or higher rating in the 'chill☁️' playlist",
+  "all": [
+    {"gt": {"rating": 3}},
+    {"inPlaylist": {"id": "c0680472-7b43-4f3d-a522-c18e1cae9f19"}}
+  ],
+  "sort": "dateadded",
+  "order": "desc",
+  "limit": 5000
+}
