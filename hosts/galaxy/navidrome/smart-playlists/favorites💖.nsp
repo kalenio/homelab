@@ -1,0 +1,9 @@
+{
+  "name": "Favorites💖",
+  "comment": "Favorited songs",
+  "all": [
+    {"is": {"loved": true}}
+  ],
+  "sort": "dateLoved",
+  "order": "desc",
+}
