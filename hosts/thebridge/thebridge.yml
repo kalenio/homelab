@@ -37,9 +37,28 @@ services:
     networks:
       thebridge_net:
 
-# ----------------------------- #
-# -------- Monitoring --------- #
-# ----------------------------- #
+# --------------------------------------------------------------------
+# Monitoring 
+# --------------------------------------------------------------------
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
+    container_name: uptime-kuma
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    environment:
+      - PUID=3000
+      - GUID=3000
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./uptime-kuma/data:/data
+    ports:
+      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
+    networks:
+      thebridge_net:
+
+# --------------------------------------------------------------------
 
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VER}
@@ -75,6 +94,8 @@ services:
 #      - 9100:9100
     network_mode: host
 
+# --------------------------------------------------------------------
+
   grafana:
     image: grafana/grafana:${GRAFANA_VER}
     container_name: grafana
@@ -93,6 +114,8 @@ services:
       - 3002:3000 # <Host/External Port>:<Container/Internal Port>
     networks:
       thebridge_net:
+
+# --------------------------------------------------------------------
 
   speedtest-tracker:
     image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER}
@@ -144,27 +167,9 @@ services:
     networks:
       thebridge_net:
 
-  uptime-kuma:
-    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
-    container_name: uptime-kuma
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    environment:
-      - PUID=3000
-      - GUID=3000
-      - TZ=${TIMEZONE}
-    volumes:
-      - ./uptime-kuma/data:/data
-    ports:
-      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
-    networks:
-      thebridge_net:
-
-
-# ----------------------------- #
-# ------- Notifications ------- #
-# ----------------------------- #
+# --------------------------------------------------------------------
+# Notifications
+# --------------------------------------------------------------------
 
   ntfy:
     image: binwiederhier/ntfy:${NTFY_VER}
@@ -214,6 +219,8 @@ services:
       - 8888:8000
     networks:
       thebridge_net:
+
+# --------------------------------------------------------------------
 
 networks:
   thebridge_net:
