@@ -47,7 +47,7 @@ services:
       - "0.0.0.0:8080:80"    # Accessible from all network interfaces
       - "8080"  # Docker will automatically bind to a random available port on the host. 
                 # Useful when you don't care about the specific port number on the host but still need the container’s internal port exposed.
-    networks: # Define networks to limit unnecessary container communication channels 
+    networks: # Define networks to limit unnecessary container communication channels.
       wizard-net:
 
 # -------------------------------------------------------- #
@@ -55,7 +55,7 @@ services:
 # -------------------------------------------------------- #
 
   orb:
-    image: archmage/orb:${ORB_VERSION}
+    image: archmage/orb:${ORB_VERSION} # https://hub.docker.com/r/chronomancy_carl/orb/tags
     container_name: orb
     security_opt:
       - no-new-privileges:true
@@ -63,7 +63,8 @@ services:
     environment:
       - LOG_LEVEL=debug
     volumes:
-      - orb-config:/var/lib/backup/data  # This is a docker volume (vs. a bind mount), which is persistent container storage managed by docker
+      - ./orb-data:/data  # This is a a bind mount, which is persistent container storage NOT managed by docker.
+      - orb-config:/var/lib/backup/data  # This is a docker volume (no leading slash), which is persistent container storage managed by docker.
     networks:
       orb-net:
 
