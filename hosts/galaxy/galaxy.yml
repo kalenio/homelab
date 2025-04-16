@@ -5,7 +5,7 @@ services:
 # -----------------------------------------------------------------
 
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERSION} # OR jellyfin/jellyfin (official)
+    image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERSION:-latest} # OR jellyfin/jellyfin (official)
     container_name: jellyfin
     security_opt:
       - no-new-privileges:true
@@ -38,7 +38,7 @@ services:
 # -----------------------------------------------------------------
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:${JELLYSEERR_VERSION}
+    image: fallenbagel/jellyseerr:${JELLYSEERR_VERSION:-latest}
     container_name: jellyseerr
     security_opt:
       - no-new-privileges:true
@@ -62,7 +62,7 @@ services:
 # -----------------------------------------------------------------
 
   navidrome: # https://www.navidrome.org/docs/installation/docker/
-    image: deluan/navidrome:${NAVIDROME_VERSION}
+    image: deluan/navidrome:${NAVIDROME_VERSION:-latest}
     container_name: navidrome
     user: "${UID}:${GID}" # should be owner of volumes
     security_opt:
@@ -121,7 +121,35 @@ services:
     networks:
       audiobookshelf_net:
 
+# -----------------------------------------------------------------
+# AudioBookRequest: https://github.com/markbeep/AudioBookRequest
+# -----------------------------------------------------------------
+
+  web:
+    image: markbeep/audiobookrequest:${ABR_VERS:-latest} # https://hub.docker.com/r/markbeep/audiobookrequest/tags
+    container_name: audiobookrequest
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: galaxy.env
+    volumes:
+      - audiobookrequest-config:/config
+    ports:
+      - "8000:8000"
+    networks:
+      audiobookrequest_net:
+
 # ---------------------------------------------
+
+volumes:
+  audiobookrequest-config:
 
 networks:
   jelly_net:
@@ -129,4 +157,6 @@ networks:
   navidrome_net:
     driver: bridge
   audiobookshelf_net:
+    driver: bridge
+  audiobookrequest_net:
     driver: bridge
