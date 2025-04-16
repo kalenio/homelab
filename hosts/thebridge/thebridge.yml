@@ -10,6 +10,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     environment:
       - PUID=${UID}
       - PGID=${GID}
@@ -22,7 +27,7 @@ services:
     ports:
       - 3000:3000
     networks:
-      thebridge_net:
+      thebridge-net:
 
 # -----------------------------------------------------------------
 # Homeassistant
@@ -34,6 +39,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1024M
     environment:
       - PUID=${UID}
       - PGID=${GID}
@@ -43,7 +53,7 @@ services:
     ports:
       - 8123:8123
     networks:
-      thebridge_net:
+      thebridge-net:
 
 # --------------------------------------------------------------------
 # Uptime Kuma
@@ -55,6 +65,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
     environment:
       - PUID=3000
       - GUID=3000
@@ -64,7 +79,7 @@ services:
     ports:
       - 3001:3001 # <Host/External Port>:<Container/Internal Port>
     networks:
-      thebridge_net:
+      thebridge-net:
     
 # -----------------------------------------------------------------
 # Prometheus
@@ -76,37 +91,21 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
     user: "${UID}:${GID}"
     environment:
       - TZ=${TIMEZONE}
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
       - ./prometheus/data:/prometheus
     ports:
       - 9090:9090
     networks:
-      thebridge_net:
-
-# -----------------------------------------------------------------
-# Prometheus Node Exporter: https://github.com/prometheus/node_exporter
-# -----------------------------------------------------------------
-
-  prometheus-node-exporter:
-    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VER}
-    container_name: prometheus-node-exporter
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-#    cap_add:
-#      - SYS_TIME     # Optional, for time metrics if needed
-#      - NET_ADMIN    # Optional, for advanced network metrics
-    user: "${UID}:${GID}"
-#    pid: host
-#    volumes:
-#      - '/:/host:ro,rslave'
-#    ports:
-#      - 9100:9100
-    network_mode: host
+      thebridge-net:
     
 # -----------------------------------------------------------------
 # Grafana
@@ -118,6 +117,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     user: "${UID}:${GID}"
     environment:
       - TZ=${TIMEZONE}
@@ -129,7 +133,7 @@ services:
     ports:
       - 3002:3000 # <Host/External Port>:<Container/Internal Port>
     networks:
-      thebridge_net:
+      thebridge-net:
 
 # -----------------------------------------------------------------
 # Speedtest Tracker
@@ -141,6 +145,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     environment:
       - PUID=${UID}
       - PGID=${GID}
@@ -163,7 +172,7 @@ services:
       - 8080:80 # web UI
       - 8443:443
     networks:
-      thebridge_net:
+      thebridge-net:
 
 # -----------------------------------------------------------------
 
@@ -173,6 +182,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
     environment:
       - PUID=${UID}
       - PGID=${GID}
@@ -185,7 +199,7 @@ services:
     ports:
       - 5432:5432
     networks:
-      thebridge_net:
+      thebridge-net:
 
 # -----------------------------------------------------------------
 # ntfy
@@ -197,6 +211,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
     command:
       - serve
     healthcheck: # optional: remember to adapt the host:port to your environment
@@ -219,7 +238,7 @@ services:
     ports:
       - 8000:80
     networks:
-      thebridge_net:
+      thebridge-net:
 
 # -----------------------------------------------------------------
 # Apprise
@@ -231,6 +250,11 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
     environment:
       - PUID=${UID}
       - PGID=${GID}
@@ -242,10 +266,63 @@ services:
     ports:
       - 8888:8000
     networks:
-      thebridge_net:
+      thebridge-net:
+
+# -----------------------------------------------------------------
+# Prometheus Node Exporter: https://github.com/prometheus/node_exporter
+# -----------------------------------------------------------------
+
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VERS:-latest} # https://quay.io/repository/prometheus/node-exporter?tab=tags
+    container_name: prometheus-node-exporter
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    read_only: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    pid: host
+    env_file: thebridge.env
+    environment:
+      - TZ=${TIMEZONE:-Etc/UTC}
+#    user: "${UID}:${GID}"
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    ports:
+      - 9100:9100
+    network_mode: host
+
+# -----------------------------------------------------------------
+# cAdvisor: https://github.com/google/cadvisor
+# -----------------------------------------------------------------
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERS:-latest}
+    container_name: cadvisor
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    ports:
+      - 8080:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    network_mode: host
 
 # --------------------------------------------------------------------
 
 networks:
-  thebridge_net:
+  thebridge-net:
   postgres-data:
