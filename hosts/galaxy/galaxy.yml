@@ -5,7 +5,7 @@ services:
 # -----------------------------------------------------------------
 
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERSION:-latest} # OR jellyfin/jellyfin (official)
+    image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERS:-latest} # OR jellyfin/jellyfin (official)
     container_name: jellyfin
     security_opt:
       - no-new-privileges:true
@@ -45,7 +45,7 @@ services:
 # -----------------------------------------------------------------
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:${JELLYSEERR_VERSION:-latest}
+    image: fallenbagel/jellyseerr:${JELLYSEERR_VERS:-latest}
     container_name: jellyseerr
     security_opt:
       - no-new-privileges:true
@@ -76,7 +76,7 @@ services:
 # -----------------------------------------------------------------
 
   navidrome: # https://www.navidrome.org/docs/installation/docker/
-    image: deluan/navidrome:${NAVIDROME_VERSION:-latest}
+    image: deluan/navidrome:${NAVIDROME_VERS:-latest}
     container_name: navidrome
     user: "${UID}:${GID}" # should be owner of volumes
     security_opt:
@@ -167,17 +167,66 @@ services:
     networks:
       audiobookrequest_net:
 
-# ---------------------------------------------
+# -----------------------------------------------------------------
+# Prometheus Node Exporter: https://github.com/prometheus/node_exporter
+# -----------------------------------------------------------------
+
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VERS:-latest} # https://quay.io/repository/prometheus/node-exporter?tab=tags
+    container_name: prometheus-node-exporter
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    read_only: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    pid: host
+    env_file: galaxy.env
+    environment:
+      - TZ=${TIMEZONE:-Etc/UTC}
+#    user: "${UID}:${GID}"
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    ports:
+      - 9100:9100
+    network_mode: host
+
+# -----------------------------------------------------------------
+# cAdvisor: https://github.com/google/cadvisor
+# -----------------------------------------------------------------
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERS:-latest}
+    container_name: cadvisor
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    network_mode: host
+
+# -----------------------------------------------------------------
 
 volumes:
   audiobookrequest-config:
 
 networks:
   jelly_net:
-    driver: bridge
   navidrome_net:
-    driver: bridge
   audiobookshelf_net:
-    driver: bridge
   audiobookrequest_net:
-    driver: bridge
