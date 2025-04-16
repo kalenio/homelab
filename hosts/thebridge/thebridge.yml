@@ -165,6 +165,8 @@ services:
     networks:
       thebridge_net:
 
+# -----------------------------------------------------------------
+
   postgres-db: # db for speedtest-tracker
     image: postgres:${POSTGRES_VER}
     container_name: postgres-db
