@@ -1,5 +1,9 @@
 services:
 
+# -----------------------------------------------------------------
+# Homepage
+# -----------------------------------------------------------------
+
   homepage:
     image: ghcr.io/gethomepage/homepage:${HOMEPAGE_VER}
     container_name: homepage
@@ -20,6 +24,10 @@ services:
     networks:
       thebridge_net:
 
+# -----------------------------------------------------------------
+# Homeassistant
+# -----------------------------------------------------------------
+
   homeassistant:
     image: homeassistant/home-assistant:${HOMEASSISTANT_VER}
     container_name: homeassistant
@@ -38,7 +46,7 @@ services:
       thebridge_net:
 
 # --------------------------------------------------------------------
-# Monitoring 
+# Uptime Kuma
 # --------------------------------------------------------------------
 
   uptime-kuma:
@@ -57,8 +65,10 @@ services:
       - 3001:3001 # <Host/External Port>:<Container/Internal Port>
     networks:
       thebridge_net:
-
-# --------------------------------------------------------------------
+    
+# -----------------------------------------------------------------
+# Prometheus
+# -----------------------------------------------------------------
 
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VER}
@@ -77,6 +87,10 @@ services:
     networks:
       thebridge_net:
 
+# -----------------------------------------------------------------
+# Prometheus Node Exporter: https://github.com/prometheus/node_exporter
+# -----------------------------------------------------------------
+
   prometheus-node-exporter:
     image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VER}
     container_name: prometheus-node-exporter
@@ -93,8 +107,10 @@ services:
 #    ports:
 #      - 9100:9100
     network_mode: host
-
-# --------------------------------------------------------------------
+    
+# -----------------------------------------------------------------
+# Grafana
+# -----------------------------------------------------------------
 
   grafana:
     image: grafana/grafana:${GRAFANA_VER}
@@ -115,7 +131,9 @@ services:
     networks:
       thebridge_net:
 
-# --------------------------------------------------------------------
+# -----------------------------------------------------------------
+# Speedtest Tracker
+# -----------------------------------------------------------------
 
   speedtest-tracker:
     image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER}
@@ -167,9 +185,9 @@ services:
     networks:
       thebridge_net:
 
-# --------------------------------------------------------------------
-# Notifications
-# --------------------------------------------------------------------
+# -----------------------------------------------------------------
+# ntfy
+# -----------------------------------------------------------------
 
   ntfy:
     image: binwiederhier/ntfy:${NTFY_VER}
@@ -200,6 +218,10 @@ services:
       - 8000:80
     networks:
       thebridge_net:
+
+# -----------------------------------------------------------------
+# Apprise
+# -----------------------------------------------------------------
 
   apprise-api:
     image: lscr.io/linuxserver/apprise-api:${APPRISE_VER}
