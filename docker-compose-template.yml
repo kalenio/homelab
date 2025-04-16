@@ -26,7 +26,7 @@ services:
     deploy: # Limit maximum system resources available to the container
       resources:
         limits:
-          cpus: '1'
+          cpus: '0.5'
           memory: 512M 
     user: "${UID}:${GID}" # Specify non-admin/root user and run container as that user
     environment:
@@ -49,6 +49,7 @@ services:
                 # Useful when you don't care about the specific port number on the host but still need the container’s internal port exposed.
     networks: # Define networks to limit unnecessary container communication channels.
       wizard-net:
+      orb-net: # containers can be placed on more than one network depending on how you wish them to communicate.
 
 # -------------------------------------------------------- #
 # Pondering: https://guidetopondering.blogspot.com/docker
