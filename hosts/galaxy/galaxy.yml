@@ -10,6 +10,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '6'
+          memory: 8192M
     runtime: nvidia
     environment:
       - PUID=${UID}
@@ -43,6 +50,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
     cap_add:
       - NET_ADMIN
     environment:
@@ -68,6 +82,13 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
     environment:
       # Optional: put your config options customization here. Examples:
       ND_SCANSCHEDULE: 1h
