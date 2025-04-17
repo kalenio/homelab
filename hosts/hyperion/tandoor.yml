@@ -20,7 +20,7 @@ services:
       tandoor_net:
 
   web_recipes:
-    image: vabene1111/recipes
+    image: vabene1111/recipes:feature-vue3
     container_name: tandoor
     security_opt:
       - no-new-privileges:true
