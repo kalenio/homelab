@@ -23,7 +23,6 @@ services:
     volumes:
       - ./homepage/config:/app/config
       - ./homepage/images:/app/public/images
-#      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations. USE SOCKET PROXY INSTEAD: https://github.com/Tecnativa/docker-socket-proxy
     ports:
       - 3000:3000
     networks:
