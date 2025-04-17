@@ -169,7 +169,7 @@ services:
       - ./speedtest-tracker/config:/config
       - ./speedtest-tracker/keys:/config/keys
     ports:
-      - 8080:80 # web UI
+      - 8086:80 # web UI
       - 8443:443
     networks:
       thebridge-net:
