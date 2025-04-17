@@ -75,7 +75,7 @@ services:
       - GUID=3000
       - TZ=${TIMEZONE}
     volumes:
-      - ./uptime-kuma/data:/data
+      - ./uptime-kuma/data:/app/data
     ports:
       - 3001:3001 # <Host/External Port>:<Container/Internal Port>
     networks:
