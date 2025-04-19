@@ -364,12 +364,11 @@ services:
           cpus: '0.5'
           memory: 256M
     volumes:
-      - ./alloy/config.yaml:/etc/alloy/config.yaml:ro # File must be created prior to container creation.
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro # File must be created prior to containe>
       - /var/log:/var/log
     command:
       - run
-      - /etc/alloy/config.yaml
-      - --config.format=otelcol
+      - /etc/alloy/config.alloy
       - --server.http.listen-addr=0.0.0.0:3200
       - --storage.path=/var/lib/alloy/data
     ports:
@@ -378,7 +377,7 @@ services:
     depends_on:
       - loki
     networks:
-      loki:
+      - loki
 
 # --------------------------------------------------------------------
 
