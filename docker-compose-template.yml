@@ -61,6 +61,9 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    profiles: [debug] # Services can be assigned to one or more profiles; 
+                      # unassigned services start/stop by default, while assigned ones only start/stop when their profile is active.
+                      # Example: 'docker compose --profile debug up'
     environment:
       - LOG_LEVEL=debug
     volumes:
