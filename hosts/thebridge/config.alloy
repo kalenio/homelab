@@ -1,0 +1,27 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// Listen for syslog on UDP/514, tag each entry,
+// and forward into the "router" write pipeline:
+loki.source.syslog "router" {
+  listener {
+    address  = "0.0.0.0:514"
+    protocol = "udp"
+    labels   = {
+      job    = "router",       // <-- comma between fields
+      source = "quasar1",
+    }
+  }
+
+  // must match the write block below
+  forward_to = [loki.write.router.receiver]
+}
+
+// Push into Loki at http://loki:3100
+loki.write "router" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
