@@ -79,7 +79,7 @@ services:
       - 3001:3001 # <Host/External Port>:<Container/Internal Port>
     networks:
       thebridge-net:
-    
+
 # -----------------------------------------------------------------
 # Prometheus
 # -----------------------------------------------------------------
@@ -105,7 +105,7 @@ services:
       - 9090:9090
     networks:
       thebridge-net:
-    
+
 # -----------------------------------------------------------------
 # Grafana
 # -----------------------------------------------------------------
@@ -342,7 +342,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./loki/loki-config.yaml:/etc/loki/config.yaml
+      - ./loki/loki-config.yaml:/etc/loki/config.yaml # File must be created prior to container creation.
     ports:
       - 3100:3100
     networks:
@@ -366,11 +366,11 @@ services:
     depends_on:
       - loki
     volumes:
-      - ./alloy/alloy-config.yaml:/config/config.alloy:ro
+      - ./alloy/alloy-config.yaml:/etc/alloy/config.alloy:ro # File must be created prior to container creation.
       - /var/log:/var/log
-    command: 
+    command:
       - run
-      - /config/config.alloy
+#      - /etc/alloy/config.alloy
       - --storage.path=/var/lib/alloy/data
       - --server.http.listen-addr=0.0.0.0:3200
     ports:
