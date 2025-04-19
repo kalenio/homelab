@@ -133,6 +133,7 @@ services:
       - 3002:3000 # <Host/External Port>:<Container/Internal Port>
     networks:
       thebridge-net:
+      loki:
 
 # -----------------------------------------------------------------
 # Speedtest Tracker
@@ -320,8 +321,61 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     network_mode: host
 
+# -----------------------------------------------------------------
+# Loki: https://github.com/grafana/loki
+# -----------------------------------------------------------------
+
+  loki:
+    image: grafana/loki:${LOKI_VERS:-latest}
+    container_name: loki
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      loki:
+
+# -----------------------------------------------------------------
+# Alloy: https://grafana.com/docs/alloy/latest/set-up/install/docker/
+# -----------------------------------------------------------------
+
+  alloy:
+    image: grafana/alloy:${ALLOY_VERS:-latest}
+    container_name: alloy
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    depends_on:
+      - loki
+    pull_policy: always
+    volumes:
+      - /var/log:/var/log
+      - ./alloy/config:/etc/alloy
+    command: 
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:12345
+    ports:
+      - 12345:12345 # dashboard port
+    networks:
+      loki:
+
 # --------------------------------------------------------------------
 
 networks:
   thebridge-net:
   postgres-data:
+  loki:
