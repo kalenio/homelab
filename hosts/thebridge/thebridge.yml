@@ -366,11 +366,11 @@ services:
     depends_on:
       - loki
     volumes:
-      - ./alloy/alloy-config.yaml:/etc/alloy/config.alloy:ro
+      - ./alloy/alloy-config.yaml:/config/config.alloy:ro
       - /var/log:/var/log
     command: 
       - run
-#      - /etc/alloy/config.alloy
+      - /config/config.alloy
       - --storage.path=/var/lib/alloy/data
       - --server.http.listen-addr=0.0.0.0:3200
     ports:
