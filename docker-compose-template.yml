@@ -64,6 +64,9 @@ services:
     profiles: [debug] # Services can be assigned to one or more profiles; 
                       # unassigned services start/stop by default, while assigned ones only start/stop when their profile is active.
                       # Example: 'docker compose --profile debug up'
+    depends_on:   # Allows control of the order of service startup and shutdown.
+      - grimoire  # In this example, grimoire and potion are created before orb, and orb is removed before grimoire and potion.
+      - potion
     environment:
       - LOG_LEVEL=debug
     volumes:
