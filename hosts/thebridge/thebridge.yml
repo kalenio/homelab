@@ -368,7 +368,7 @@ services:
       - /var/log:/var/log
     command:
       - run
-      - /etc/alloy/config.alloy
+      - --config.file=/etc/alloy/config.alloy
       - --server.http.listen-addr=0.0.0.0:3200
       - --storage.path=/var/lib/alloy/data
       - --stability.level=public-preview
