@@ -371,7 +371,7 @@ services:
       - --config.file=/etc/alloy/config.alloy
       - --server.http.listen-addr=0.0.0.0:3200
       - --storage.path=/var/lib/alloy/data
-      - --stability.level=public-preview
+      - --stability.level=experimental
     ports:
       - 3200:3200 # dashboard port
       - "514:514/udp"  # Syslog input from router
