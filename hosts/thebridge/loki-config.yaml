@@ -1,6 +1,5 @@
 auth_enabled: false
 
-auth_enabled: false
 analytics:
   reporting_enabled: false
   usage_stats_url: ""
