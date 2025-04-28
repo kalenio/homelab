@@ -365,16 +365,18 @@ services:
           memory: 256M
     volumes:
       - ./alloy/config.alloy:/etc/alloy/config.alloy:ro # File must be created prior to container creation.
-      - /var/log:/var/log
+      - /var/log/router.log:/var/log/router.log:ro
     command:
-      - run
+      - run # https://grafana.com/docs/alloy/latest/reference/cli/run/
       - /etc/alloy/config.alloy
+      - --disable-reporting=true
       - --server.http.listen-addr=0.0.0.0:3200
       - --storage.path=/var/lib/alloy/data
       - --stability.level=experimental
     ports:
       - 3200:3200 # dashboard port
-#      - "514:514/udp"  # Syslog input from router
+#      - "514:514/udp"  # Syslog input directly from router. Router must support RFC5424 compliant syslog or
+                        # logs must be reformatted by rsyslog or similar first.
     depends_on:
       - loki
     networks:
