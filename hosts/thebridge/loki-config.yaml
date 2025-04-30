@@ -6,6 +6,8 @@ analytics:
 
 server:
   http_listen_port: 3100
+  log_level: debug
+  disable_telemetry: true
 
 ingester:
   lifecycler:
