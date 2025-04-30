@@ -375,8 +375,9 @@ services:
       - --stability.level=experimental
     ports:
       - 3200:3200 # dashboard port
-#      - "514:514/udp"  # Syslog input directly from router. Router must support RFC5424 compliant syslog or
-                        # logs must be reformatted by rsyslog or similar first.
+      - "1514:1514/tcp" # Syslog input from Proxmox, pushed by rsyslog.
+#     - "514:514/udp"  # Syslog input directly from router. Router must support RFC5424 compliant syslog or
+                       # logs must be reformatted by rsyslog or similar first.
     depends_on:
       - loki
     networks:
