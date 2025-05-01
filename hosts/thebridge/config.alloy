@@ -13,10 +13,22 @@ loki.source.file "router" {
       },
     },
   ]
-  forward_to = [loki.write.router.receiver]
+  forward_to = [loki.write.default.receiver]
 }
 
-loki.write "router" {
+loki.source.syslog "proxmox_syslog" {
+  listener {
+    address  = "0.0.0.0:1514"
+    protocol = "tcp"
+    labels = {
+      job    = "syslog",
+      source = "proxmox",
+    }
+  }
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"
   }
