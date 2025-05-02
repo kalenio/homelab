@@ -4,9 +4,9 @@
 
 services:
 
-# -------------------------------------------------------- #
+# ======================================================== #
 # foo: https://www.foo.org/docs/#docker-compose-install
-# -------------------------------------------------------- #
+# ======================================================== #
 
   foo:
     image: foo:${FOO_VERS:-latest} # Specify a container version via .env variable FOO_VERS with a fallback (latest).
@@ -51,9 +51,9 @@ services:
       wizard-net:
       orb-net: # containers can be placed on more than one network depending on how you wish them to communicate.
 
-# -------------------------------------------------------- #
+# ======================================================== #
 # Pondering: https://guidetopondering.blogspot.com/docker
-# -------------------------------------------------------- #
+# ======================================================== #
 
   orb:
     image: archmage/orb:${ORB_VERSION} # https://hub.docker.com/r/chronomancy_carl/orb/tags
@@ -75,7 +75,7 @@ services:
     networks:
       orb-net:
 
-# -------------------------------------------------------- #
+# ======================================================== #
 
 volumes:
   orb-config:
