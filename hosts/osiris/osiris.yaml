@@ -1,0 +1,38 @@
+services:
+
+# ======================================================== #
+# frigate: https://github.com/blakeblackshear/frigate/blob/dev/docs/docs/guides/getting_started.md
+# ======================================================== #
+
+# On startup, an admin user and password will be created and outputted in the logs. 
+# You can see this by running `docker logs frigate`. 
+
+  frigate:
+    container_name: frigate
+    image: ghcr.io/blakeblackshear/frigate:${FRIGATE_VERS:-stable}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4096M
+    env_file: osiris.env
+    volumes:
+      - ./frigate/config:/config
+      - ./frigate/storage:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8971:8971" # Web UI
+      - "8554:8554" # RTSP feeds
+    networks:
+      osiris-net:
+
+# ======================================================== #
+
+networks:
+  osiris-net:
