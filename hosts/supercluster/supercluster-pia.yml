@@ -67,6 +67,26 @@ services:
     volumes:
       - ./pia/shared:/config:ro
 
+  seedboxapi:
+    image: myanonamouse/seedboxapi
+    container_name: seedboxapi
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 56M
+    user: ${UID}:${GID}
+    network_mode: "service:vpn"
+    environment:
+      - mam_id=${MAM_ID}
+      - interval=1
+      - DEBUG=1
+    volumes:
+      - ./seedboxapi:/config
+
   flaresolverr:
     image: flaresolverr/flaresolverr:${FLARESOLVERR_VERSION}
     container_name: flaresolverr
