@@ -85,7 +85,7 @@ services:
       - interval=1
       - DEBUG=1
     volumes:
-      - ./seedboxapi:/config
+      - ./seedboxapi:/config # may need to adjust permissions if encountering file creation error: sudo chown -R 3000:3000 /home/xo/seedboxapi
 
   flaresolverr:
     image: flaresolverr/flaresolverr:${FLARESOLVERR_VERSION}
