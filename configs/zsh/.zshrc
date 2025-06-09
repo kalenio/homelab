@@ -81,7 +81,7 @@ source $ZSH/oh-my-zsh.sh
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#7daea3'
 
-PROMPT='%F{color8}%n@%m%f %F{blue}%1~%f %# '
+PROMPT='%F{color8}%n@%m%f %F{blue}%1~%f $(git_prompt_info)%# '
 
 # Custom bindkeys
 # Sets 'CTRL + SPACE' to accept autosuggestion from zsh-autosuggestion plugin
