@@ -47,7 +47,7 @@ ZSH_THEME="robbyrussell"
 # You can also set it to another string to have that shown instead of the default red dots.
 # e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
 # Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -80,6 +80,8 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#7daea3'
+
+PROMPT='%F{color8}%n@%m%f %F{blue}%1~%f %# '
 
 # Custom bindkeys
 # Sets 'CTRL + SPACE' to accept autosuggestion from zsh-autosuggestion plugin
@@ -114,7 +116,9 @@ bindkey '^ ' autosuggest-accept
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias install='sudo pacman -S'
 alias grepc='grep -n --color=auto'
 alias tidal='function _orpheus(){ cd ~/Applications/OrpheusDL && source ./.venv/bin/activate && python3 orpheus.py "$@"; }; _orpheus'
 alias tu='sudo tailscale up'
 alias td='sudo tailscale down'
+alias bonsai='cbonsai -S'
