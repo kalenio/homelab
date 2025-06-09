@@ -85,7 +85,8 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#7daea3'
 PROMPT='%F{color8}%m%f %F{blue}%1~%f %# '
 
 #RPROMPT='$(git_prompt_info)'
-RPROMPT='$(git_prompt_info) $(if command -v tailscale &> /dev/null && [[ $(tailscale status) != *"Tailscale is stopped."* ]]; then echo "%F{green}%f Tailscale"; fi)'
+RPROMPT='$(git_prompt_info) $(if command -v tailscale &> /dev/null && [[ $(tailscale status) != *"Tailscale is stopped."* ]]; then echo "%F{green}%f Tailscale"; else echo "%F{yellow}%f Tailscale"; fi)'
+
 
 # Custom bindkeys
 # Sets 'CTRL + SPACE' to accept autosuggestion from zsh-autosuggestion plugin
