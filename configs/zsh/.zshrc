@@ -134,10 +134,17 @@ alias tu='sudo tailscale up'
 alias td='sudo tailscale down'
 alias bonsai='cbonsai -S'
 
-# Activate streamrip with 'srip'
-srip() {
+# Activate streamrip with 'sr'
+sr() {
   cd ~/Applications/streamrip || return
   source .venv/bin/activate
-  rip --quality 3 "$@"
+  rip --quality 3 url "$@"
   deactivate
+}
+
+# Launch tidal-dl-ng-gui with 'ng'
+ng() {
+  cd ~/Applications/tidal-dl-ng || return
+  source .venv/bin/activate
+  tidal-dl-ng-gui
 }
