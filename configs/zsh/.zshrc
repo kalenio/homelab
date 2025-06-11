@@ -133,3 +133,11 @@ alias tidal='function _orpheus(){ cd ~/Applications/OrpheusDL && source ./.venv/
 alias tu='sudo tailscale up'
 alias td='sudo tailscale down'
 alias bonsai='cbonsai -S'
+
+# Activate streamrip with 'srip'
+srip() {
+  cd ~/Applications/streamrip || return
+  source .venv/bin/activate
+  rip --quality 3 "$@"
+  deactivate
+}
