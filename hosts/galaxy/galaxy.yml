@@ -1,8 +1,8 @@
 services:
 
-# -----------------------------------------------------------------
-# Jellyfin:
-# -----------------------------------------------------------------
+# ============================================================== #
+# Jellyfin: https://github.com/jellyfin/jellyfin
+# ============================================================== #
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERS:-latest} # OR jellyfin/jellyfin (official)
@@ -40,9 +40,9 @@ services:
     networks:
       jelly_net:
 
-# -----------------------------------------------------------------
-# Jellyseerr:
-# -----------------------------------------------------------------
+# ============================================================== #
+# Jellyseerr: https://github.com/Fallenbagel/jellyseerr
+# ============================================================== #
 
   jellyseerr:
     image: fallenbagel/jellyseerr:${JELLYSEERR_VERS:-latest}
@@ -71,9 +71,9 @@ services:
     networks:
       jelly_net:
 
-# -----------------------------------------------------------------
-# Navidrome:
-# -----------------------------------------------------------------
+# ============================================================== #
+# Navidrome: https://github.com/navidrome/navidrome
+# ============================================================== #
 
   navidrome: # https://www.navidrome.org/docs/installation/docker/
     image: deluan/navidrome:${NAVIDROME_VERS:-latest}
@@ -112,9 +112,40 @@ services:
     networks:
       navidrome_net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
+# Maloja: https://github.com/krateng/maloja/blob/master/example-compose.yml
+# ============================================================== #
+
+# Needs additional config as per https://github.com/krateng/maloja/blob/master/settings.md
+
+  maloja:
+    image: krateng/maloja:${MALOJA_VERS:-latest} # https://hub.docker.com/r/krateng/maloja/tags
+    container_name: maloja
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - MALOJA_FORCE_PASSWORD=${MALOJA_ADMIN_PASS}
+      - MALOJA_DATA_DIRECTORY=/data
+    ports:
+    - "42010:42010"
+    volumes:
+    - ./maloja/data:/data
+    networks:
+      maloja_net:
+
+# ============================================================== #
 # Audiobookshelf: https://www.audiobookshelf.org/docs/#docker-compose-install
-# -----------------------------------------------------------------
+# ============================================================== #
 
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:${ABS_VERS:-latest}
@@ -142,9 +173,9 @@ services:
     networks:
       audiobookshelf_net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # AudioBookRequest: https://github.com/markbeep/AudioBookRequest
-# -----------------------------------------------------------------
+# ============================================================== #
 
   web:
     image: markbeep/audiobookrequest:${ABR_VERS:-latest} # https://hub.docker.com/r/markbeep/audiobookrequest/tags
@@ -167,9 +198,9 @@ services:
     networks:
       audiobookrequest_net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Prometheus Node Exporter: https://github.com/prometheus/node_exporter
-# -----------------------------------------------------------------
+# ============================================================== #
 
   prometheus-node-exporter:
     image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VERS:-latest} # https://quay.io/repository/prometheus/node-exporter?tab=tags
@@ -196,9 +227,9 @@ services:
 #     - 9100:9100
     network_mode: host
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # cAdvisor: https://github.com/google/cadvisor
-# -----------------------------------------------------------------
+# ============================================================== #
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERS:-latest}
@@ -221,7 +252,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     network_mode: host
 
-# -----------------------------------------------------------------
+# ============================================================== #
 
 volumes:
   audiobookrequest-config:
