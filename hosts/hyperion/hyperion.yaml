@@ -1,0 +1,429 @@
+services:
+
+# ============================================================== #
+# wger: https://github.com/wger-project/docker/tree/master
+# ============================================================== #
+
+  web:
+    image: wger/server:${WGER_VERS:-latest}
+    container_name: wger
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    env_file:
+      - ./wger.env
+    volumes:
+      - wger-static:/home/wger/static
+      - ./wger/media:/home/wger/media
+    expose:
+      - 8000
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8000
+      interval: 10s
+      timeout: 5s
+      start_period: 300s
+      retries: 5
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  db:
+    image: postgres:15-alpine
+    container_name: wger-db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    env_file:
+      - ./wger.env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=wger
+      - TZ=America/Denver
+    volumes:
+      - ./wger/postgres-data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    healthcheck:
+      test: pg_isready -U wger
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  nginx:
+    image: nginx:stable
+    container_name: wger-nginx
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+    depends_on:
+      - web
+    volumes:
+      - wger-static:/wger/static:ro
+      - ./wger/config/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./wger/media:/wger/media:ro
+    ports:
+      - "8844:80"
+    healthcheck:
+      test: service nginx status
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  cache:
+    image: redis
+    container_name: wger-cache
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    expose:
+      - 6379
+    volumes:
+      - wger-redis-data:/data
+      - ./wger/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf"]
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  celery_worker:
+    image: wger/server:latest
+    container_name: wger-worker
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    command: /start-worker
+    env_file:
+      - ./wger.env
+    volumes:
+      - ./wger/media:/home/wger/media
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: celery -A wger inspect ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  celery_beat:
+    image: wger/server:latest
+    container_name: wger-beat
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    command: /start-beat
+    env_file:
+      - ./wger.env
+    volumes:
+      - wger-celery-beat:/home/wger/beat/
+    depends_on:
+      celery_worker:
+        condition: service_healthy
+    networks:
+      wger_net:
+
+# ============================================================== #
+# Tandoor: https://github.com/TandoorRecipes/recipes
+# ============================================================== #
+
+  web_recipes:
+    image: vabene1111/recipes:feature-vue3
+    container_name: tandoor
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: tandoor.env
+    volumes:
+      - tandoor-nginx-config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
+      - ./tandoor/recipes:/opt/recipes/staticfiles
+      - ./tandoor/mediafiles:/opt/recipes/mediafiles    
+    depends_on:
+      - db_recipes
+    networks:
+      tandoor_net:
+
+# ============================================================== #
+
+  db_recipes:
+    image: postgres:16-alpine
+    container_name: tandoor-db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    env_file: tandoor.env
+    volumes:
+      - ./tandoor/postgresql:/var/lib/postgresql/data
+    networks:
+      tandoor_net:
+
+# ============================================================== #
+
+  nginx_recipes:
+    image: nginx:mainline-alpine
+    container_name: tandoor-nginx
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+    env_file: tandoor.env
+    volumes:
+      - ./tandoor/staticfiles:/static:ro
+      - ./tandoor/mediafiles:/media:ro
+      - tandoor-nginx-config:/etc/nginx/conf.d:ro # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
+    depends_on:
+      - web_recipes
+    ports:
+      - 8086:80
+    networks:
+      tandoor_net:
+
+# ============================================================== #
+# Linkwarden: https://docs.linkwarden.app/self-hosting/installation
+# ============================================================== #
+
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest
+    container_name: linkwarden
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    environment:
+      # DATABASE_URL = engine://username:password@host:port/dbname.
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    volumes:
+      - ./linkwarden/data:/data/data
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    networks:
+      linkwarden_net:
+
+# ============================================================== #
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: linkwarden-db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    env_file: hyperion.env
+    volumes:
+      - ./linkwarden/pgdata:/var/lib/postgresql/data
+    networks:
+      linkwarden_net:
+
+# ============================================================== #
+# ConvertX: https://github.com/C4illin/ConvertX
+# ============================================================== #
+
+  convertx:
+    image: ghcr.io/c4illin/convertx
+    container_name: convertx
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    env_file: hyperion.env
+    environment:
+      - JWT_SECRET=${CONVERTX_JWT_SECRET} # will use randomUUID() if unset
+      - HTTP_ALLOWED=false
+      - ALLOW_UNAUTHENTICATED=false
+      - AUTO_DELETE_EVERY_N_HOURS=24
+      - ACCOUNT_REGISTRATION=false
+    volumes:
+      - ./convertx/data:/app/data
+    ports:
+      - 3003:3000
+    networks:
+      convertx_net:
+
+
+# ============================================================== #
+# Prometheus Node Exporter: https://github.com/prometheus/node_exporter
+# ============================================================== #
+
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VERS:-latest} # https://quay.io/repository/prometheus/node-exporter?tab=tags
+    container_name: prometheus-node-exporter
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    read_only: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+    pid: host
+    env_file: hyperion.env
+    environment:
+      - TZ=${TIMEZONE:-America/Denver}
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    ports:
+      - 9100:9100
+    network_mode: host
+
+# ============================================================== #
+# cAdvisor: https://github.com/google/cadvisor
+# ============================================================== #
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERS:-latest}
+    container_name: cadvisor
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 128M
+    env_file: hyperion.env
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    network_mode: host
+
+# ============================================================== #
+# ============================================================== #
+
+networks:
+  wger_net:
+    driver: bridge
+  tandoor_net:
+    driver: bridge
+  linkwarden_net:
+    driver: bridge
+  convertx_net:
+    driver: bridge
+
+# wger warning: Heads up, if you remove these volumes and use folders directly you need to chown them
+# to the UID and GID 1000 even if it doesn't exist on your system. Also, they should
+# be readable by everyone.
+
+volumes:
+  wger-static:
+  # wger-postgres-data:
+  wger-celery-beat:
+  wger-redis-data:
+  tandoor-nginx-config:
