@@ -7,8 +7,8 @@ services:
   web:
     container_name: wger
     env_file:
-      - ./wger/config/prod.env
-      - ./wger/config/prod.override.env
+      - ./config/prod.env
+      - ./config/prod.override.env
     volumes:
       - wger-static:/home/wger/static
       - ./wger/media:/home/wger/media
@@ -20,8 +20,8 @@ services:
   db:
     container_name: wger-db
     env_file:
-      - ./wger/config/prod.env
-      - ./wger/config/prod.override.env
+      - ./config/prod.env
+      - ./config/prod.override.env
     environment:
       - TZ=America/Denver
     volumes:
@@ -58,8 +58,8 @@ services:
   celery_worker:
     container_name: wger-worker
     env_file:
-      - ./wger/config/prod.env
-      - ./wger/config/prod.override.env
+      - ./config/prod.env
+      - ./config/prod.override.env
     volumes:
       - media:/home/wger/media
     networks:
@@ -70,8 +70,8 @@ services:
   celery_beat:
     container_name: wger-beat
     env_file:
-      - ./wger/config/prod.env
-      - ./wger/config/prod.override.env
+      - ./config/prod.env
+      - ./config/prod.override.env
     volumes:
       - wger-celery-beat:/home/wger/beat/
     networks:
