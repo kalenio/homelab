@@ -125,7 +125,6 @@ services:
   multi-scrobbler:
     image: foxxmd/multi-scrobbler:${MULTI-SCROB_VERS:-latest}
     container_name: multi-scrobbler
-    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
