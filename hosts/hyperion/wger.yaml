@@ -23,10 +23,10 @@ services:
       cache:
         condition: service_healthy
     env_file:
-      - ./wger/wger.env
+      - ./wger.env
     volumes:
       - wger-static:/home/wger/static
-      - ./wger/media:/home/wger/media
+      - ./media:/home/wger/media
     expose:
       - 8000
     healthcheck:
@@ -54,14 +54,14 @@ services:
           cpus: '0.5'
           memory: 128M
     env_file:
-      - ./wger/wger.env
+      - ./wger.env
     environment:
       - POSTGRES_USER=wger
       - POSTGRES_PASSWORD=wger
       - POSTGRES_DB=wger
       - TZ=America/Denver
     volumes:
-      - ./wger/postgres-data:/var/lib/postgresql/data/
+      - ./postgres-data:/var/lib/postgresql/data/
     expose:
       - 5432
     healthcheck:
@@ -92,8 +92,8 @@ services:
       - web
     volumes:
       - wger-static:/wger/static:ro
-      - ./wger/config/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./wger/media:/wger/media:ro
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./media:/wger/media:ro
     ports:
       - "8844:80"
     healthcheck:
@@ -124,7 +124,7 @@ services:
       - 6379
     volumes:
       - wger-redis-data:/data
-      - ./wger/config/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf"]
     healthcheck:
       test: redis-cli ping
@@ -152,9 +152,9 @@ services:
           memory: 256M
     command: /start-worker
     env_file:
-      - ./wger/wger.env
+      - ./wger.env
     volumes:
-      - ./wger/media:/home/wger/media
+      - ./media:/home/wger/media
     depends_on:
       web:
         condition: service_healthy
@@ -184,7 +184,7 @@ services:
           memory: 256M
     command: /start-beat
     env_file:
-      - ./wger/wger.env
+      - ./wger.env
     volumes:
       - wger-celery-beat:/home/wger/beat/
     depends_on:
