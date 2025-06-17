@@ -1,0 +1,95 @@
+services:
+
+# ============================================================== #
+# wger: https://github.com/wger-project/docker/tree/master
+# ============================================================== #
+
+  web:
+    container_name: wger
+    env_file:
+      - ./wger/wger.env
+      - ./wger/wger.override.env
+    volumes:
+      - wger-static:/home/wger/static
+      - ./wger/media:/home/wger/media
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  db:
+    container_name: wger-db
+    env_file:
+      - ./wger/wger.env
+      - ./wger/wger.override.env
+    environment:
+      - POSTGRES_USER=wger
+      - POSTGRES_PASSWORD=${WGER_DB_PASS}
+      - POSTGRES_DB=wger-db
+      - TZ=America/Denver
+    volumes:
+      - ./wger/postgres-data:/var/lib/postgresql/data/
+    networks:
+      wger_net:
+    
+# ============================================================== #
+
+  nginx:
+    container_name: wger-nginx
+    volumes:
+      - wger-static:/wger/static:ro
+      - ./wger/media:/wger/media:ro
+      - ./wger/config/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8088:80"
+    networks:
+      wger_net:
+      
+# ============================================================== #
+
+  cache:
+    image: redis
+    container_name: wger-cache
+    volumes:
+      - wger-redis-data:/data
+      - ./wger/config/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  celery_worker:
+    container_name: wger-worker
+    env_file:
+      - ./wger/wger.env
+      - ./wger/wger.override.env
+    volumes:
+      - media:/home/wger/media
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  celery_beat:
+    container_name: wger-beat
+    volumes:
+      - wger-celery-beat:/home/wger/beat/
+    env_file:
+      - ./wger/wger.env
+      - ./wger/wger.override.env
+    networks:
+      wger_net:
+
+# ============================================================== #
+
+  # Heads up, if you remove these volumes and use folders directly you need to chown them
+  # to the UID and GID 1000 even if it doesn't exist on your system. Also, they should
+  # be readable by everyone.
+
+volumes:
+  wger-static:
+  wger-celery-beat:
+  wger-redis-data:
+
+networks:
+  wger_net:
