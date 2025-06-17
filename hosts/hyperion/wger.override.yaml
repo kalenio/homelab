@@ -7,8 +7,8 @@ services:
   web:
     container_name: wger
     env_file:
-      - ./wger.env
-      - ./wger.override.env
+      - ./wger/config/prod.env
+      - ./wger/config/prod.override.env
     volumes:
       - wger-static:/home/wger/static
       - ./wger/media:/home/wger/media
@@ -20,8 +20,8 @@ services:
   db:
     container_name: wger-db
     env_file:
-      - ./wger.env
-      - ./wger.override.env
+      - ./wger/config/prod.env
+      - ./wger/config/prod.override.env
     environment:
       - POSTGRES_USER=wger
       - POSTGRES_PASSWORD=${WGER_DB_PASS}
@@ -61,8 +61,8 @@ services:
   celery_worker:
     container_name: wger-worker
     env_file:
-      - ./wger.env
-      - ./wger.override.env
+      - ./wger/config/prod.env
+      - ./wger/config/prod.override.env
     volumes:
       - media:/home/wger/media
     networks:
@@ -75,8 +75,8 @@ services:
     volumes:
       - wger-celery-beat:/home/wger/beat/
     env_file:
-      - ./wger.env
-      - ./wger.override.env
+      - ./wger/config/prod.env
+      - ./wger/config/prod.override.env
     networks:
       wger_net:
 
