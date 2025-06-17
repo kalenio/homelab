@@ -72,11 +72,11 @@ services:
 
   celery_beat:
     container_name: wger-beat
-    volumes:
-      - wger-celery-beat:/home/wger/beat/
     env_file:
       - ./wger/config/prod.env
       - ./wger/config/prod.override.env
+    volumes:
+      - wger-celery-beat:/home/wger/beat/
     networks:
       wger_net:
 
