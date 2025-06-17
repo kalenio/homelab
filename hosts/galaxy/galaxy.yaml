@@ -176,8 +176,6 @@ services:
           memory: 256M
     env_file: galaxy.env
     environment:
-      - PUID=${UID}
-      - PGID=${GID}
       - MALOJA_FORCE_PASSWORD=${MALOJA_ADMIN_PASS}
       - MALOJA_DATA_DIRECTORY=/data
       - MALOJA_PROXY_IMAGES=TRUE # Whether third party images should be downloaded and served directly by Maloja (instead of just linking their URL).
