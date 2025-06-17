@@ -23,9 +23,6 @@ services:
       - ./wger/config/prod.env
       - ./wger/config/prod.override.env
     environment:
-      - POSTGRES_USER=wger
-      - POSTGRES_PASSWORD=${WGER_DB_PASS}
-      - POSTGRES_DB=wger-db
       - TZ=America/Denver
     volumes:
       - ./wger/postgres-data:/var/lib/postgresql/data/
