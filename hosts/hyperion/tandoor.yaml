@@ -34,9 +34,9 @@ services:
           memory: 512M
     env_file: tandoor.env
     volumes:
+      - nginx_config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
       - ./tandoor/recipes:/opt/recipes/staticfiles
       - ./tandoor/mediafiles:/opt/recipes/mediafiles
-      - nginx_config:/opt/recipes/nginx/conf.d # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - db_recipes
     networks:
@@ -57,9 +57,9 @@ services:
           memory: 512M
     env_file: tandoor.env
     volumes:
+      - nginx_config:/etc/nginx/conf.d:ro # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
       - ./tandoor/staticfiles:/static:ro
       - ./tandoor/mediafiles:/media:ro
-      - nginx_config:/etc/nginx/conf.d:ro # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
     depends_on:
       - web_recipes
     ports:
