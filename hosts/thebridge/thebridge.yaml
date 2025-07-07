@@ -62,7 +62,7 @@ services:
 # To do this go to Actions -> Settings -> set user/password for the webUI.
 
   syncthing:
-    image: lscr.io/linuxserver/syncthing:${SYNCTHING_VERSION:-latest}
+    image: lscr.io/linuxserver/syncthing:${SYNCTHING_VER:-latest}
     container_name: syncthing
     security_opt:
       - no-new-privileges:true
