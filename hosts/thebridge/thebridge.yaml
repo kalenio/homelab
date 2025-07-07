@@ -1,11 +1,11 @@
 services:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Homepage
-# -----------------------------------------------------------------
+# ============================================================== #
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_VER}
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_VER:-latest}
     container_name: homepage
     security_opt:
       - no-new-privileges:true
@@ -28,12 +28,12 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Homeassistant
-# -----------------------------------------------------------------
+# ============================================================== #
 
   homeassistant:
-    image: homeassistant/home-assistant:${HOMEASSISTANT_VER}
+    image: homeassistant/home-assistant:${HOMEASSISTANT_VER:-latest}
     container_name: homeassistant
     security_opt:
       - no-new-privileges:true
@@ -54,13 +54,16 @@ services:
     networks:
       thebridge-net:
 
-# --------------------------------------------------------------------
-# Uptime Kuma: https://github.com/louislam/uptime-kuma/blob/1.23.X/docker/docker-compose.yml
-# --------------------------------------------------------------------
+# ============================================================== #
+# Syncthing: https://docs.linuxserver.io/images/docker-syncthing/
+# ============================================================== #
 
-  uptime-kuma:
-    image: louislam/uptime-kuma:${UPTIME_KUMA_VER}
-    container_name: uptime-kuma
+# The Syncthing devs highly suggest setting a password for this container, as it listens on 0.0.0.0. 
+# To do this go to Actions -> Settings -> set user/password for the webUI.
+
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:${SYNCTHING_VERSION:-latest}
+    container_name: syncthing
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -68,7 +71,38 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 512M
+          memory: 1024M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./syncthing/config:/config
+      - ./syncthing/repositories:/repositories
+    ports:
+      - 8384:8384 # WebUI
+      - 22000:22000/tcp # TCP listening port
+      - 22000:22000/udp # UDP listening port
+      - 21027:21027/udp # Protocol discovery
+    networks:
+      syncthing-net:
+
+
+# ============================================================== #
+# Uptime Kuma: https://github.com/louislam/uptime-kuma/blob/1.23.X/docker/docker-compose.yml
+# ============================================================== #
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:${UPTIME_KUMA_VER:-latest}
+    container_name: uptime-kuma
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     environment:
       - PUID=3000
       - GUID=3000
@@ -80,12 +114,12 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Prometheus
-# -----------------------------------------------------------------
+# ============================================================== #
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VER}
+    image: prom/prometheus:${PROMETHEUS_VER:-latest}
     container_name: prometheus
     security_opt:
       - no-new-privileges:true
@@ -106,12 +140,12 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Grafana
-# -----------------------------------------------------------------
+# ============================================================== #
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VER}
+    image: grafana/grafana:${GRAFANA_VER:-latest}
     container_name: grafana
     security_opt:
       - no-new-privileges:true
@@ -135,12 +169,12 @@ services:
       thebridge-net:
       loki:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Speedtest Tracker
-# -----------------------------------------------------------------
+# ============================================================== #
 
   speedtest-tracker:
-    image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER}
+    image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER:-latest}
     container_name: speedtest-tracker
     security_opt:
       - no-new-privileges:true
@@ -174,10 +208,10 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 
   postgres-db: # db for speedtest-tracker
-    image: postgres:${POSTGRES_VER}
+    image: postgres:${POSTGRES_VER:-latest}
     container_name: postgres-db
     security_opt:
       - no-new-privileges:true
@@ -201,12 +235,12 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # ntfy
-# -----------------------------------------------------------------
+# ============================================================== #
 
   ntfy:
-    image: binwiederhier/ntfy:${NTFY_VER}
+    image: binwiederhier/ntfy:${NTFY_VER:-latest}
     container_name: ntfy
     security_opt:
       - no-new-privileges:true
@@ -240,12 +274,12 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Apprise
-# -----------------------------------------------------------------
+# ============================================================== #
 
   apprise-api:
-    image: lscr.io/linuxserver/apprise-api:${APPRISE_VER}
+    image: lscr.io/linuxserver/apprise-api:${APPRISE_VER:-latest}
     container_name: apprise
     security_opt:
       - no-new-privileges:true
@@ -268,9 +302,9 @@ services:
     networks:
       thebridge-net:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Prometheus Node Exporter: https://github.com/prometheus/node_exporter
-# -----------------------------------------------------------------
+# ============================================================== #
 
   prometheus-node-exporter:
     image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VERS:-latest} # https://quay.io/repository/prometheus/node-exporter?tab=tags
@@ -297,9 +331,9 @@ services:
 #     - 9100:9100
     network_mode: host
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # cAdvisor: https://github.com/google/cadvisor
-# -----------------------------------------------------------------
+# ============================================================== #
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERS:-latest}
@@ -321,9 +355,9 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     network_mode: host
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Loki: https://github.com/grafana/loki
-# -----------------------------------------------------------------
+# ============================================================== #
 
   loki:
     image: grafana/loki:${LOKI_VERS:-latest}
@@ -348,9 +382,9 @@ services:
     networks:
       loki:
 
-# -----------------------------------------------------------------
+# ============================================================== #
 # Alloy: https://grafana.com/docs/alloy/latest/set-up/install/docker/
-# -----------------------------------------------------------------
+# ============================================================== #
 
   alloy:
     image: grafana/alloy:${ALLOY_VERS:-latest}
@@ -383,9 +417,10 @@ services:
     networks:
       - loki
 
-# --------------------------------------------------------------------
+# ============================================================== #
 
 networks:
   thebridge-net:
+  syncthing-net:
   postgres-data:
   loki:
