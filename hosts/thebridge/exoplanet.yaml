@@ -1,0 +1,32 @@
+services:
+
+# ============================================================== #
+# Uptime Kuma: https://github.com/louislam/uptime-kuma/blob/1.23.X/docker/docker-compose.yml
+# ============================================================== #
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    environment:
+      - PUID=3000
+      - GUID=3000
+      - TZ=America/Denver
+    volumes:
+      - ./uptime-kuma/data:/app/data
+    ports:
+      - 3001:3001 # WebUI
+    networks:
+      kuma-net:
+
+# ============================================================== #
+
+networks:
+  kuma-net:
