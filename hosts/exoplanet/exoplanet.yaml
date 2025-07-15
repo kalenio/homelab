@@ -24,9 +24,40 @@ services:
     ports:
       - 3001:3001 # WebUI
     networks:
-      kuma-net:
+      exoplanet-net:
+
+# ============================================================== #
+# Caddy: https://hub.docker.com/_/caddy/
+# ============================================================== #
+
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    environment:
+      - PUID=3000
+      - PGID=3000
+      - TZ=America/Denver
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    ports:
+      - 80:80 # http
+      - 443:443 # https
+      - 2019:2019 # admin endpoint
+    networks:
+      exoplanet-net:
 
 # ============================================================== #
 
 networks:
-  kuma-net:
+  exoplanet-net:
+    driver: bridge
