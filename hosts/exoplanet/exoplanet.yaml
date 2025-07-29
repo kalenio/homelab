@@ -59,7 +59,8 @@ services:
 # ============================================================== #
 
   caddy:
-    image: caddy:alpine
+    build: .
+    image: caddy-cloudflare:latest
     container_name: caddy
     security_opt:
       - no-new-privileges:true
