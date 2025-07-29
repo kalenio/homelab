@@ -60,7 +60,7 @@ services:
 
   caddy:
     build: .
-    image: caddy-cloudflare:latest
+    image: caddy-custom:latest
     container_name: caddy
     security_opt:
       - no-new-privileges:true
