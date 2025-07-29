@@ -22,7 +22,7 @@ services:
     volumes:
       - ./uptime-kuma/data:/app/data
     ports:
-      - 3001:3001 # WebUI
+      - 127.0.0.1:3001:3001 # WebUI access for localhost to allow for healthchecks.io ping script
     networks:
       exoplanet-net:
 
