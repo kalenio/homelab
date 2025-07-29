@@ -13,7 +13,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: '0.25'
           memory: 256M
     environment:
       - PUID=3000
@@ -23,6 +23,34 @@ services:
       - ./uptime-kuma/data:/app/data
     ports:
       - 3001:3001 # WebUI
+    networks:
+      exoplanet-net:
+
+# ============================================================== #
+# Homepage: https://gethomepage.dev/installation/docker/
+# ============================================================== #
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+    environment:
+      - PUID=3000
+      - PGID=3000
+      - TZ=America/Denver
+      - HOMEPAGE_ALLOWED_HOSTS=home.kalen.io
+    volumes:
+      - ./homepage/config:/app/config
+      - ./homepage/images:/app/public/images
+    ports:
+      - 3000:3000
     networks:
       exoplanet-net:
 
@@ -39,7 +67,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: '0.25'
           memory: 64M
     environment:
       - PUID=3000
