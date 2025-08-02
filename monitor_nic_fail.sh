@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Create: nano /usr/local/bin/monitor_nic_fail.sh
+# Make executable: chmod +x /usr/local/bin/monitor_nic_fail.sh
+# Run for the first time (in background): /usr/local/bin/monitor_nic_fail.sh &
 # Add this line to crontab (crontab -e) to run on reboot: @reboot /usr/local/bin/monitor_nic_fail.sh
 
 # Define the NIC name and the log to monitor
