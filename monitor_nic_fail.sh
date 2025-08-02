@@ -2,7 +2,7 @@
 
 # Define the NIC name and the log to monitor
 NIC="eno2"
-LOG_FILE="/var/log/syslog"  # Or /var/log/messages depending on your distribution
+LOG_FILE="/var/log/syslog"
 HANG_MSG="Detected Hardware Unit Hang"
 
 # Loop to continuously check the logs
