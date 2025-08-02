@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Create: nano /usr/local/bin/monitor_nic_fail.sh
+# Add this line to crontab (crontab -e) to run on reboot: @reboot /path/to/monitor_nic_fail.sh
+
 # Define the NIC name and the log to monitor
 NIC="eno2"
 LOG_FILE="/var/log/syslog"
