@@ -49,8 +49,6 @@ services:
     volumes:
       - ./homepage/config:/app/config
       - ./homepage/images:/app/public/images
-    ports:
-      - 3000:3000
     networks:
       exoplanet-net:
 
@@ -119,8 +117,6 @@ services:
     volumes:
       - ./ntfy/cache:/var/cache/ntfy
       - ./ntfy/data:/etc/ntfy
-    ports:
-      - 8000:80
     networks:
       exoplanet-net:
 
