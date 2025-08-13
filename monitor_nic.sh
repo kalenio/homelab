@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Create: nano /usr/local/bin/monitor_nic_fail.sh
-# Make executable: chmod +x /usr/local/bin/monitor_nic_fail.sh
-# Run for the first time (in background): /usr/local/bin/monitor_nic_fail.sh &
-# Add this line to crontab (crontab -e) to run on reboot: @reboot /usr/local/bin/monitor_nic_fail.sh
+# Create: nano /usr/local/bin/monitor_nic.sh
+# Make executable: chmod +x /usr/local/bin/monitor_nic.sh
+# Create systemd service: nano /etc/systemd/system/monitor_nic.service
+# Paste content from monitor_nic.service
+# Reload: systemctl daemon-reload
+# Enable: systemctl enable --now monitor_nic.service
 
 # NIC to monitor
 NIC="eno2"
