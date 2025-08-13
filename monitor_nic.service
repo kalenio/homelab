@@ -1,0 +1,13 @@
+[Unit]
+Description=NIC Failure Monitor
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/monitor_nic_fail.sh
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/nic_monitor_debug.log
+StandardError=append:/var/log/nic_monitor_debug.log
+
+[Install]
+WantedBy=multi-user.target
