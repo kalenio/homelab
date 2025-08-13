@@ -6,8 +6,8 @@ After=network.target
 ExecStart=/usr/local/bin/monitor_nic.sh
 Restart=always
 RestartSec=5
-StandardOutput=append:/var/log/monisor_nic_debug.log
-StandardError=append:/var/log/monisor_nic_debug.log
+StandardOutput=append:/var/log/monitor_nic_debug.log
+StandardError=append:/var/log/monitor_nic_debug.log
 
 [Install]
 WantedBy=multi-user.target
