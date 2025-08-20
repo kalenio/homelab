@@ -137,6 +137,7 @@ services:
       - ./qbittorrent/config:/config
       - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
       - ${TORRENTS_PATH}/mam.cookies:/mam.cookies # For MyAnonaMouse dynamic IP update
+      - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
         condition: service_healthy
@@ -165,6 +166,7 @@ services:
       - ./sonarr/config:/config
       - ${DOWNLOADS_PATH}:/nebula-downloads
       - ${SERIES_PATH}:/nebula-media/series
+      - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
         condition: service_healthy
@@ -191,6 +193,7 @@ services:
       - ./radarr/config:/config
       - ${DOWNLOADS_PATH}:/nebula-downloads
       - ${MOVIES_PATH}:/nebula-media/movies
+      - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
         condition: service_healthy
