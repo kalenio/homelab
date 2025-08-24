@@ -23,13 +23,10 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
-      - NVIDIA_VISIBLE_DEVICES=all
+      - LIBVA_DRIVER_NAME=iHD
+      - LIBVA_VAAPI_DEVICE=/dev/dri/renderD128
     devices:
-      - /dev/nvidia-uvm
-      - /dev/nvidia-uvm-tools
-      - /dev/nvidia-modeset
-      - /dev/nvidiactl
-      - /dev/nvidia0
+      - /dev/dri:dev/dri
     volumes:
       - ./jellyfin/config:/config
       - ./jellyfin/cache:/cache
