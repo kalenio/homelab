@@ -1,0 +1,43 @@
+services:
+
+# ============================================================== #
+# borg-ui: https://github.com/karanhudia/borg-ui
+# ============================================================== #
+
+  borg-ui:
+    image: ainullcode/borg-ui:${BORGUI_VER:-latest}
+    container_name: borg-web-ui
+    host_name: borg-web-ui
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      - TZ=America/Denver  # Set your timezone
+      - PUID=3000
+      - PGID=3000
+    env_file: sysops.env
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./borg-web-ui/borg_data:/data
+      - ./borg-web-ui/borg_cache:/home/borg/.cache/borg
+      # Mount directories you want to backup (REPLACE with your actual paths)
+      - /home/yourusername:/local:rw     # Replace with your directory path
+    networks:
+      borg-net:
+
+# ============================================================== #
+
+volumes:
+  borg_data:
+  borg_cache:
+
+networks:
+  borg-net:
