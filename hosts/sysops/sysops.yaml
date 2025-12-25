@@ -6,8 +6,8 @@ services:
 
   borg-ui:
     image: ainullcode/borg-ui:${BORGUI_VER:-latest}
-    container_name: borg-web-ui
-    host_name: borg-web-ui
+    container_name: borg-ui
+    host_name: borg-ui
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -19,19 +19,435 @@ services:
           cpus: '0.5'
           memory: 512M
     environment:
-      - TZ=America/Denver  # Set your timezone
-      - PUID=3000
-      - PGID=3000
-    env_file: sysops.env
+      - TZ=${TIMEZONE}
+      - PUID=${UID}
+      - PGID=${GID}
     ports:
       - "8081:8081"
     volumes:
-      - ./borg-web-ui/borg_data:/data
-      - ./borg-web-ui/borg_cache:/home/borg/.cache/borg
+      - /home/xo/borg-ui/data:/data
+      - /home/xo/borg-ui/cache:/home/borg/.cache/borg
       # Mount directories you want to backup (REPLACE with your actual paths)
-      - /home/yourusername:/local:rw     # Replace with your directory path
+      #- /home/xo:/local:rw     # Replace with your directory path
     networks:
       borg-net:
+
+# ============================================================== #
+# Homepage
+# ============================================================== #
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_VER:-latest}
+    container_name: homepage
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_DOMAIN}
+    volumes:
+      - /home/xo/homepage/config:/app/config
+      - /home/xo/homepage/images:/app/public/images
+    ports:
+      - 3000:3000
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# Homeassistant
+# ============================================================== #
+
+  homeassistant:
+    image: homeassistant/home-assistant:${HOMEASSISTANT_VER:-latest}
+    container_name: homeassistant
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1024M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - /home/xo/homeassistant/config:/config
+    ports:
+      - 8123:8123
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# Syncthing: https://docs.linuxserver.io/images/docker-syncthing/
+# ============================================================== #
+
+# The Syncthing devs highly suggest setting a password for this container, as it listens on 0.0.0.0. 
+# To do this go to Actions -> Settings -> set user/password for the webUI.
+
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:${SYNCTHING_VER:-latest}
+    container_name: syncthing
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1024M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - /home/xo/syncthing/config:/config
+      - /home/xo/syncthing/repositories:/repositories
+    ports:
+      - 8384:8384 # WebUI
+      - 22000:22000/tcp # TCP listening port
+      - 22000:22000/udp # UDP listening port
+      - 21027:21027/udp # Protocol discovery
+    networks:
+      syncthing-net:
+
+
+# ============================================================== #
+# Uptime Kuma: https://github.com/louislam/uptime-kuma/blob/1.23.X/docker/docker-compose.yml
+# ============================================================== #
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:${UPTIME_KUMA_VER:-latest}
+    container_name: uptime-kuma
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    environment:
+      - PUID=3000
+      - GUID=3000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /home/xo/uptime-kuma/data:/app/data
+    ports:
+      - 3001:3001 # <Host/External Port>:<Container/Internal Port>
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# Prometheus
+# ============================================================== #
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VER:-latest}
+    container_name: prometheus
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    user: "${UID}:${GID}"
+    environment:
+      - TZ=${TIMEZONE}
+    volumes:
+      - /home/xo/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro # Main config. Sets global settings, scrape targets, etc. Create file prior to launching container
+      - /home/xo/prometheus/data:/prometheus
+    ports:
+      - 9090:9090
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# Grafana
+# ============================================================== #
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VER:-latest}
+    container_name: grafana
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    user: "${UID}:${GID}"
+    environment:
+      - TZ=${TIMEZONE}
+      - GF_SERVER_ROOT_URL=${GRAFANA_SERVER_URL}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel #installs official clock plugin
+#      - GF_LOG_LEVEL=debug
+    volumes:
+      - /home/xo/grafana/data:/var/lib/grafana
+    ports:
+      - 3002:3000 # <Host/External Port>:<Container/Internal Port>
+    networks:
+      sysop-net:
+      loki:
+
+# ============================================================== #
+# Speedtest Tracker
+# ============================================================== #
+
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER:-latest}
+    container_name: speedtest-tracker
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - APP_KEY=${SPEEDTEST_APP_KEY} # How to generate an app key: https://speedtest-tracker.dev/
+      - DB_CONNECTION=pgsql # postgres
+      - SPEEDTEST_SCHEDULE="0 */6 * * *" # cron format, set to run at minute 0 past every 6th hour
+      - SPEEDTEST_SERVERS=8839 # Find with: 'docker exec speedtest-tracker' 'php /app/www/artisan app:ookla-list-servers'
+      - DB_HOST=${POSTGRES_DB_HOST} # optional
+      - DB_PORT=5432 # optional
+      - DB_DATABASE=${POSTGRES_DATABASE_NAME} # optional
+      - DB_USERNAME=${POSTGRES_USER} # optional
+      - DB_PASSWORD=${POSTGRES_PASSWORD} # optional
+      - PRUNE_RESULTS_OLDER_THAN=365 # optional, days to keep test results
+#      - APP_DEBUG=true
+    volumes:
+      - /home/xo/speedtest-tracker/config:/config
+      - /home/xo/speedtest-tracker/keys:/config/keys
+    ports:
+      - 8086:80 # web UI
+      - 8443:443
+    networks:
+      sysop-net:
+
+# ============================================================== #
+
+  postgres-db: # db for speedtest-tracker
+    image: postgres:${POSTGRES_VER:-latest}
+    container_name: postgres-db
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE_NAME}
+    volumes:
+      - /home/xo/speedtest-tracker/postgres-db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# ntfy
+# ============================================================== #
+
+  ntfy:
+    image: binwiederhier/ntfy:${NTFY_VER:-latest}
+    container_name: ntfy
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    command:
+      - serve
+    healthcheck: # optional: remember to adapt the host:port to your environment
+      test:
+        [
+          'CMD-SHELL',
+          "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1",
+        ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - PUID=${UID}
+      - PGID=${UID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - /home/xo/ntfy/cache:/var/cache/ntfy
+      - /home/xo/ntfy/data:/etc/ntfy
+    ports:
+      - 8000:80
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# Apprise
+# ============================================================== #
+
+  apprise-api:
+    image: lscr.io/linuxserver/apprise-api:${APPRISE_VER:-latest}
+    container_name: apprise
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - APPRISE_ATTACH_SIZE=64 # optional, max attachment size in Mb. 0 disables attachments.
+    volumes:
+      - /home/xo/apprise/config:/config
+      - /home/xo/apprise/attachments:/attachments # optional
+    ports:
+      - 8888:8000
+    networks:
+      sysop-net:
+
+# ============================================================== #
+# Prometheus Node Exporter: https://github.com/prometheus/node_exporter
+# ============================================================== #
+
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:${PROM_NODE_EXP_VERS:-latest} # https://quay.io/repository/prometheus/node-exporter?tab=tags
+    container_name: prometheus-node-exporter
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    read_only: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    pid: host
+    env_file: thebridge.env
+    environment:
+      - TZ=${TIMEZONE:-Etc/UTC}
+#    user: "${UID}:${GID}"
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+#   ports:
+#     - 9100:9100
+    network_mode: host
+
+# ============================================================== #
+# cAdvisor: https://github.com/google/cadvisor
+# ============================================================== #
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERS:-latest}
+    container_name: cadvisor
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+#   ports:
+#     - 8080:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    network_mode: host
+
+# ============================================================== #
+# Loki: https://github.com/grafana/loki
+# ============================================================== #
+
+  loki:
+    image: grafana/loki:${LOKI_VERS:-latest}
+    container_name: loki
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /home/xo/loki/loki-config.yaml:/etc/loki/config.yaml # File must be created prior to container creation.
+    ports:
+      - 3100:3100
+    networks:
+      loki:
+
+# ============================================================== #
+# Alloy: https://grafana.com/docs/alloy/latest/set-up/install/docker/
+# ============================================================== #
+
+  alloy:
+    image: grafana/alloy:${ALLOY_VERS:-latest}
+    container_name: alloy
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    volumes:
+      - /home/xo/alloy/config.alloy:/etc/alloy/config.alloy:ro # File must be created prior to container creation.
+      - /var/log/router.log:/var/log/router.log:ro
+    command:
+      - run # https://grafana.com/docs/alloy/latest/reference/cli/run/
+      - /etc/alloy/config.alloy
+      - --disable-reporting=true
+      - --server.http.listen-addr=0.0.0.0:3200
+      - --storage.path=/var/lib/alloy/data
+      - --stability.level=experimental
+    ports:
+      - 3200:3200 # dashboard port
+      - "1514:1514/tcp" # Syslog input from Proxmox, pushed by rsyslog.
+#     - "514:514/udp"  # Syslog input directly from router. Router must support RFC5424 compliant syslog or
+                       # logs must be reformatted by rsyslog or similar first.
+    depends_on:
+      - loki
+    networks:
+      - loki
 
 # ============================================================== #
 
@@ -41,3 +457,7 @@ volumes:
 
 networks:
   borg-net:
+  sysop-net:
+  syncthing-net:
+  postgres-data:
+  loki:
