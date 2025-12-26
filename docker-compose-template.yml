@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     tmpfs: # Temporary filesystem, mounts /tmp as memory-backed instead of disk-backed. Increase I/O performance, reduces disk wear, and increases security by
            # isolating the container's temporary data from the host's filesystem.
-      - /tmp
+      - /tmp:nosuid,nodev
     deploy: # Limit maximum system resources available to the container
       resources:
         limits:
