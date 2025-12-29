@@ -16,9 +16,7 @@ services:
       resources:
         limits:
           cpus: '6'
-          memory: 8192M
-    runtime: nvidia
-    env_file: galaxy.env
+          memory: 12288M
     environment:
       - PUID=${UID}
       - PGID=${GID}
@@ -28,10 +26,10 @@ services:
     devices:
       - /dev/dri:dev/dri
     volumes:
-      - ./jellyfin/config:/config
-      - ./jellyfin/cache:/cache
-      - ${SERIES_PATH}:/media-library/series:ro
-      - ${MOVIES_PATH}:/media-library/movies:ro
+      - /home/xo/docker/jellyfin/config:/config
+      - /home/xo/docker/jellyfin/cache:/cache
+      - ${SERIES_PATH}:/series:ro
+      - ${MOVIES_PATH}:/movies:ro
     ports:
       - 8096:8096/tcp # http webUI
       - 8920:8920/tcp # https webUI
@@ -53,18 +51,17 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
+          cpus: '2'
+          memory: 1024M
     cap_add:
       - NET_ADMIN
-    env_file: galaxy.env
     environment:
       - PUID=${UID}
       - PGID=${GID}
       - LOG_LEVEL=debug
       - TZ=${TIMEZONE}
     volumes:
-      - ./jellyseerr/config:/app/config
+      - /home/xo/docker/jellyseerr/config:/app/config
     ports:
       - 5055:5055
     networks:
@@ -88,7 +85,6 @@ services:
         limits:
           cpus: '1'
           memory: 2048M
-    env_file: galaxy.env
     environment:
       # Optional: put your config options customization here. Examples:
       ND_SCANSCHEDULE: 1h
@@ -104,8 +100,8 @@ services:
       ND_BACKUP_SCHEDULE: "0 0 * * *" # every 24 hours at 12am
       ND_BACKUP_COUNT: 7
     volumes:
-      - ./navidrome/data:/data
-      - ./navidrome/backups:/backups
+      - /home/xo/docker/navidrome/data:/data
+      - /home/xo/docker/navidrome/backups:/backups
       - ${MUSIC_PATH}:/music:ro
     ports:
       - 4533:4533
@@ -132,7 +128,6 @@ services:
         limits:
           cpus: '0.2'
           memory: 256M
-    env_file: galaxy.env
     environment:
       - TZ=${TIMEZONE}
       - BASE_URL=${MS_BASE_URL}
@@ -148,7 +143,7 @@ services:
       - PUID=${UID}
       - PGID=${GID}
     volumes:
-      - ./multi-scrobbler/config:/config
+      - /home/xo/docker/multi-scrobbler/config:/config
     ports:
       - 9078:9078 # UI and API
     networks:
@@ -173,14 +168,13 @@ services:
         limits:
           cpus: '0.5'
           memory: 256M
-    env_file: galaxy.env
     environment:
       - MALOJA_FORCE_PASSWORD=${MALOJA_ADMIN_PASS}
       - MALOJA_DATA_DIRECTORY=/data
       - MALOJA_PROXY_IMAGES=TRUE # Whether third party images should be downloaded and served directly by Maloja (instead of just linking their URL).
       - MALOJA_TIMEZONE=${TIMEZONE}
     volumes:
-      - ./maloja/data:/data
+      - /home/xo/docker/maloja/data:/data
     ports:
       - 42010:42010 # UI
     networks:
@@ -203,14 +197,13 @@ services:
         limits:
           cpus: '1'
           memory: 512M
-    env_file: galaxy.env
     environment:
       - AUDIOBOOKSHELF_UID=${UID}
       - AUDIOBOOKSHELF_GID=${GID}
     volumes:
       - ${BOOKS_PATH}:/books
-      - ./audiobookshelf/metadata:/metadata
-      - ./audiobookshelf/config:/config
+      - /home/xo/docker/audiobookshelf/metadata:/metadata
+      - /home/xo/docker/audiobookshelf/config:/config
     ports:
       - 13378:80
     networks:
@@ -233,7 +226,6 @@ services:
         limits:
           cpus: '1'
           memory: 256M
-    env_file: galaxy.env
     volumes:
       - audiobookrequest-config:/config
     ports:
@@ -258,7 +250,6 @@ services:
           cpus: '0.5'
           memory: 64M
     pid: host
-    env_file: galaxy.env
     environment:
       - TZ=${TIMEZONE:-Etc/UTC}
     command:
