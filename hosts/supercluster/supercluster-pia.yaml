@@ -1,9 +1,11 @@
 services:
 
-  ###### ----- Network ----- ######
+# ============================================================== #
+# docker-wireguard-pia: https://github.com/thrnz/docker-wireguard-pia
+# ============================================================== #
 
   vpn:
-    image: thrnz/docker-wireguard-pia:${VPN_VERS:-latest} # https://github.com/thrnz/docker-wireguard-pia
+    image: thrnz/docker-wireguard-pia:${VPN_VERS:-latest}
     container_name: docker-wireguard-pia
     security_opt:
       - no-new-privileges:true
@@ -13,7 +15,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '0.5'
           memory: 64M
     cap_add:
       - NET_ADMIN
@@ -26,7 +28,7 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.lo.disable_ipv6=1
     environment:
-      - LOCAL_NETWORK=192.168.1.0/24
+      - LOCAL_NETWORK=10.0.0.0/8
       - LOC=swiss
       - USER=${PIA_USER}
       - PASS=${PIA_PASSWORD}
@@ -35,8 +37,8 @@ services:
       - PORT_FILE=/pia-shared/forwarded_port.txt # The forwarded port number is dumped here for possible access by scripts in other containers. By default this is /pia-shared/port.dat.
       - KEEPALIVE=25 # This can be used to ensure incoming packets on an idle link aren't lost when behind NAT.
     volumes:
-      - ./pia:/pia # Auth token is stored here
-      - ./pia/shared:/pia-shared # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
+      - /home/xo/docker/pia:/pia # Auth token is stored here
+      - /home/xo/docker/pia/shared:/pia-shared # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
     ports:
       - 8080:8080 # qbitorrent web ui
       - 8989:8989 # sonarr web ui
@@ -45,8 +47,12 @@ services:
       - 6767:6767 # bazarr web ui
       - 8191:8191 # flaresolverr
 
+# ============================================================== #
+# qb-port: # https://hub.docker.com/r/charlocharlie/qbittorrent-port-forward-file
+# ============================================================== #
+
   qb-port:
-    image: charlocharlie/qbittorrent-port-forward-file:${QBPORT_VERS:-latest} # https://hub.docker.com/r/charlocharlie/qbittorrent-port-forward-file
+    image: charlocharlie/qbittorrent-port-forward-file:${QBPORT_VERS:-latest}
     container_name: qb-port
     security_opt:
       - no-new-privileges:true
@@ -56,7 +62,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '0.5'
           memory: 64M
     network_mode: "service:vpn"
     environment:
@@ -65,7 +71,11 @@ services:
       - QBT_ADDR:${QBT_ADDR}
       - PORT_FILE:/config/forwarded_port.txt
     volumes:
-      - ./pia/shared:/config:ro
+      - /home/xo/docker/pia/shared:/config:ro
+
+# ============================================================== #
+# seedboxapi:
+# ============================================================== #
 
   seedboxapi:
     image: myanonamouse/seedboxapi
@@ -77,7 +87,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 56M
+          memory: 64M
     user: ${UID}:${GID}
     network_mode: "service:vpn"
     environment:
@@ -85,7 +95,11 @@ services:
       - interval=1
       - DEBUG=1
     volumes:
-      - ./seedboxapi:/config # may need to adjust permissions if encountering file creation error: sudo chown -R 3000:3000 /home/xo/seedboxapi
+      - /home/xo/docker/seedboxapi:/config # may need to adjust permissions if encountering file creation error: sudo chown -R 3000:3000 /home/xo/seedboxapi
+
+# ============================================================== #
+# flaresolverr:
+# ============================================================== #
 
   flaresolverr:
     image: flaresolverr/flaresolverr:${FLARESOLVERR_VERSION}
@@ -112,7 +126,11 @@ services:
       vpn:
         condition: service_healthy
 
-  qbittorrent: # https://docs.linuxserver.io/images/docker-qbittorrent/
+# ============================================================== #
+# qbittorrent: # https://docs.linuxserver.io/images/docker-qbittorrent/
+# ============================================================== #
+
+  qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:${QBITTORRENT_VERSION}
     container_name: qbittorrent
     security_opt:
@@ -133,18 +151,19 @@ services:
       - WEBUI_PORT=8080
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
     volumes:
-      - ./qbittorrent/downloads:downloads-incomplete
-      - ./qbittorrent/config:/config
-      - ${TORRENTS_PATH}:/nebula-downloads/torrents:rw
-      - ${TORRENTS_PATH}/mam.cookies:/mam.cookies # For MyAnonaMouse dynamic IP update
-      - /mnt/seedpool:/seedpool
+      - /home/xo/docker/qbittorrent/downloads:downloads
+      - /home/xo/docker/qbittorrent/config:/config
+      - /mnt/seedpool:/seedpool:rw
+      - /mnt/coldpool:/cooldpool:rw
     depends_on:
       vpn:
         condition: service_healthy
 
-  ###### ----- Media Management ----- ######
+# ============================================================== #
+# sonarr: # https://docs.linuxserver.io/images/docker-sonarr/?h=sonarr
+# ============================================================== #
 
-  sonarr: # https://docs.linuxserver.io/images/docker-sonarr/?h=sonarr
+  sonarr:
     image: lscr.io/linuxserver/sonarr:${SONARR_VERSION}
     container_name: sonarr
     security_opt:
@@ -156,20 +175,23 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 2048M
+          memory: 4096M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - ./sonarr/config:/config
-      - ${DOWNLOADS_PATH}:/nebula-downloads
-      - ${SERIES_PATH}:/nebula-media/series
+      - /home/xo/docker/sonarr/config:/config
+      - ${SERIES_PATH}:/nebula/series
       - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
         condition: service_healthy
+
+# ============================================================== #
+# radarr: # https://docs.linuxserver.kalen_qbittorrentio/images/docker-radarr/#media-folders
+# ============================================================== #
 
   radarr: # https://docs.linuxserver.io/images/docker-radarr/#media-folders
     image: lscr.io/linuxserver/radarr:${RADARR_VERSION}
@@ -183,20 +205,23 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 512M
+          memory: 1024M
     network_mode: "service:vpn"
     environment:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - ./radarr/config:/config
-      - ${DOWNLOADS_PATH}:/nebula-downloads
-      - ${MOVIES_PATH}:/nebula-media/movies
+      - /home/xo/docker/radarr/config:/config
+      - ${MOVIES_PATH}:/nebula/movies
       - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
         condition: service_healthy
+
+# ============================================================== #
+# prowlarr: # https://docs.linuxserver.io/images/docker-prowlarr/
+# ============================================================== #
 
   prowlarr: # https://docs.linuxserver.io/images/docker-prowlarr/
     image: lscr.io/linuxserver/prowlarr:${PROWLARR_VERSION}
@@ -217,10 +242,14 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - ./prowlarr/config:/config
+      - /home/xo/docker/prowlarr/config:/config
     depends_on:
       vpn:
         condition: service_healthy
+
+# ============================================================== #
+# bazarr:
+# ============================================================== #
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:${BAZARR_VERSION}
@@ -241,9 +270,17 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
     volumes:
-      - ./bazarr/config:/config
-      - ${MOVIES_PATH}:/nebula-media/movies
-      - ${SERIES_PATH}:/nebula-media/series
+      - /home/xo/docker/bazarr/config:/config
+      - ${MOVIES_PATH}:/nebula/movies
+      - ${SERIES_PATH}:/nebula/series
     depends_on:
       vpn:
         condition: service_healthy
+
+# ============================================================== #
+
+#volumes:
+  #example-volume
+
+#networks:
+  #example_net:
