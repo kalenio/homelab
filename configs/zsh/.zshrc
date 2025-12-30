@@ -129,7 +129,6 @@ bindkey '^ ' autosuggest-accept
 
 alias install='sudo pacman -S'
 alias grepc='grep -n --color=auto'
-alias tidal='function _orpheus(){ cd ~/Applications/OrpheusDL && source ./.venv/bin/activate && python3 orpheus.py "$@"; }; _orpheus'
 alias tu='sudo tailscale up'
 alias td='sudo tailscale down'
 alias bonsai='cbonsai -S'
