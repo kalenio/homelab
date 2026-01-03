@@ -81,8 +81,8 @@ source $ZSH/oh-my-zsh.sh
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#7daea3'
 
-#PROMPT='%F{color8}%m@%n%f %F{blue}%1~%f $(git_prompt_info)%# '
-PROMPT='%F{color8}%m%f %F{blue}%1~%f %# '
+#PROMPT='%F{color8}%n@%m%f %F{blue}%1~%f $(git_prompt_info)%# '
+PROMPT='%F{color8}%n@%m%f %F{blue}%1~%f %# '
 
 #RPROMPT='$(git_prompt_info)'
 RPROMPT='$(git_prompt_info) $(if command -v tailscale &> /dev/null && [[ $(tailscale status) != *"Tailscale is stopped."* ]]; then echo "%F{green}%f VPN"; else echo "%F{yellow}%f VPN"; fi)'
