@@ -88,9 +88,9 @@ PROMPT='%F{2}%n%F{8}@%F{7}%m%f %F{blue}%1~%f %F{3}%#%f '
 RPROMPT='$(git_prompt_info) $(if command -v tailscale &> /dev/null && [[ $(tailscale status) != *"Tailscale is stopped."* ]]; then echo "%F{green}%f VPN"; else echo "%F{yellow}%f VPN"; fi)'
 
 # Function to add extra spacing before each prompt
-#precmd() {
-#  print ""
-#}
+precmd() {
+  print ""
+}
 
 # Custom bindkeys
 # Sets 'CTRL + SPACE' to accept autosuggestion from zsh-autosuggestion plugin
