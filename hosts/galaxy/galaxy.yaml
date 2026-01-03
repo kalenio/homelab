@@ -21,8 +21,10 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
-      - LIBVA_DRIVER_NAME=iHD
-      - LIBVA_VAAPI_DEVICE=/dev/dri/renderD128
+#      - LIBVA_DRIVER_NAME=iHD
+#      - LIBVA_VAAPI_DEVICE=/dev/dri/renderD128
+    group_add:
+      - "105"         # 'render' group for Intel GPU access. Find with: ' getent group render | cut -d: -f3 '
     devices:
       - /dev/dri:dev/dri
     volumes:
