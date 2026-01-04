@@ -149,11 +149,41 @@ services:
       - PGID=${GID}
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
-      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest # optional custom web ui. Must enable alternate web ui in qbittorrent options and point file location to /vuetorrent 
     volumes:
       - /home/xo/docker/qbittorrent/config:/config
       - /mnt/seedpool:/seedpool:rw
       - /mnt/coldpool:/cooldpool:rw
+    depends_on:
+      vpn:
+        condition: service_healthy
+
+# ============================================================== #
+# qui: https://getqui.com/docs/getting-started/docker
+# ============================================================== #
+
+  qui:
+    image: ghcr.io/autobrr/qui:${QUI_VERSION}
+    container_name: qui
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    environment: # https://getqui.com/docs/configuration/environment
+      - PUID=${UID}
+      - PGID=${GID}
+      - QUI__METRICS_ENABLED=true # enable prometheus metrics
+    volumes:
+      - /home/xo/docker/qui:/config
+      - /mnt/seedpool:/seedpool:rw
+      - /mnt/coldpool:/cooldpool:rw
+    ports:
+      - "7476:7476"
     depends_on:
       vpn:
         condition: service_healthy
