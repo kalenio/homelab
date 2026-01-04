@@ -129,7 +129,7 @@ services:
       resources:
         limits:
           cpus: '0.2'
-          memory: 256M
+          memory: 512M
     environment:
       - TZ=${TIMEZONE}
       - BASE_URL=${MS_BASE_URL}
