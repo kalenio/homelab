@@ -40,7 +40,7 @@ services:
       - /home/xo/docker/pia:/pia # Auth token is stored here
       - /home/xo/docker/pia/shared:/pia-shared # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
     ports:
-      - 8080:8080 # qbitorrent web ui
+      - 8090:8080 # qbitorrent web ui
       - 8989:8989 # sonarr web ui
       - 7878:7878 # radarr web ui
       - 9696:9696 # prowlarr web ui
