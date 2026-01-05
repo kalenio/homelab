@@ -213,7 +213,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - /home/xo/docker/sonarr/config:/config
-      - ${SERIES_PATH}:/nebula/series
+      - ${SERIES_PATH}:/series
       - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
@@ -243,7 +243,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - /home/xo/docker/radarr/config:/config
-      - ${MOVIES_PATH}:/nebula/movies
+      - ${MOVIES_PATH}:/movies
       - /mnt/seedpool:/seedpool
     depends_on:
       vpn:
@@ -301,8 +301,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - /home/xo/docker/bazarr/config:/config
-      - ${MOVIES_PATH}:/nebula/movies
-      - ${SERIES_PATH}:/nebula/series
+      - ${MOVIES_PATH}:/movies
+      - ${SERIES_PATH}:/series
     depends_on:
       vpn:
         condition: service_healthy
