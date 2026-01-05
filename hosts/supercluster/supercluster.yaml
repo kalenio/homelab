@@ -32,6 +32,7 @@ services:
       - LOC=swiss
       - USER=${PIA_USER}
       - PASS=${PIA_PASSWORD}
+      - VPNDNS=${VPNDNS}
       - PORT_FORWARDING=1
       - PORT_PERSIST=1 # Set to 1 to attempt to keep the same port forwarded when the container is restarted.
       - PORT_FILE=/pia-shared/forwarded_port.txt # The forwarded port number is dumped here for possible access by scripts in other containers. By default this is /pia-shared/port.dat.
