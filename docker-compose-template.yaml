@@ -27,6 +27,9 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
+        reservations:
+          cpus: '0.1'       # Guaranteed minimum
+          memory: 64M       # Guaranteed minimum
     user: "${UID}:${GID}" # Specify non-admin/root user and run container as that user
     environment:
       - PUID=${UID} # Some containers require that user/group are specified as environment variables instead.
