@@ -30,8 +30,8 @@ services:
     volumes:
       - /home/xo/docker/jellyfin/config:/config
       - /home/xo/docker/jellyfin/cache:/cache
-      - ${SERIES_PATH}:/series:ro
-      - ${MOVIES_PATH}:/movies:ro
+      - /mnt/series:/series:ro
+      - /mnt/movies:/movies:ro
     ports:
       - 8096:8096/tcp # http webUI
       - 8920:8920/tcp # https webUI
@@ -104,7 +104,7 @@ services:
     volumes:
       - /home/xo/docker/navidrome/data:/data
       - /home/xo/docker/navidrome/backups:/backups
-      - ${MUSIC_PATH}:/music:ro
+      - /mnt/music:/music:ro
     ports:
       - 4533:4533
     networks:
@@ -205,7 +205,7 @@ services:
       - AUDIOBOOKSHELF_UID=${UID}
       - AUDIOBOOKSHELF_GID=${GID}
     volumes:
-      - ${BOOKS_PATH}:/books
+      - /mnt/books:/books
       - /home/xo/docker/audiobookshelf/metadata:/metadata
       - /home/xo/docker/audiobookshelf/config:/config
     ports:
