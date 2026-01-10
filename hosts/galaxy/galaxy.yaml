@@ -30,8 +30,8 @@ services:
     volumes:
       - /home/xo/docker/jellyfin/config:/config
       - /home/xo/docker/jellyfin/cache:/cache
-      - /mnt/series:/series:ro
       - /mnt/movies:/movies:ro
+      - /mnt/series:/series:ro
     ports:
       - 8096:8096/tcp # http webUI
       - 8920:8920/tcp # https webUI
@@ -206,8 +206,8 @@ services:
       - AUDIOBOOKSHELF_GID=${GID}
     volumes:
       - /mnt/books:/books
-      - /home/xo/docker/audiobookshelf/metadata:/metadata
       - /home/xo/docker/audiobookshelf/config:/config
+      - /home/xo/docker/audiobookshelf/metadata:/metadata
     ports:
       - 13378:80
     networks:
