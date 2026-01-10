@@ -1,0 +1,44 @@
+services:
+
+# ============================================================== #
+# caddy: https://caddyserver.com/docs/running#docker-compose
+# ============================================================== #
+
+  caddy:
+    build: .
+    image: caddy-cloudflare:latest
+    container_name: caddy
+    security_opt:
+      - label:disable
+      - no-new-privileges:true
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - CLOUDFLARE_API_TOKEN=${CF_API_TOKEN}
+    volumes:
+      - /home/xo/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /home/xo/docker/caddy/data:/data
+      - /home/xo/docker/caddy/config:/config
+    ports:
+      - 80:80
+      - 443:443
+      - 2019:2019 # admin endpoint
+    networks:
+      - caddy-net
+
+# ============================================================== #
+
+networks:
+  caddy-net:
+    driver: bridge
