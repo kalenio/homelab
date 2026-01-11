@@ -4,6 +4,7 @@ alias install='sudo dnf install'
 alias update='sudo dnf update && sudo dnf upgrade -y'
 
 # commands --------------------------------------------------------------------
+alias tmux='tmux -f /etc/tmux.conf'
 alias grepc='grep -n --color=auto'
 alias tailu='sudo tailscale up'
 alias taild='sudo tailscale down'
