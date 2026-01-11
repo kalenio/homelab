@@ -1,0 +1,17 @@
+
+# dnf -------------------------------------------------------------------------
+alias install='sudo dnf install'
+alias update='sudo dnf update && sudo dnf upgrade -y'
+
+# commands --------------------------------------------------------------------
+alias grepc='grep -n --color=auto'
+alias tailu='sudo tailscale up'
+alias taild='sudo tailscale down'
+alias bonsai='cbonsai -S'
+
+# docker ----------------------------------------------------------------------
+alias up='docker compose -f /home/xo/docker/compose.yaml --env-file /home/xo/docker/compose.env up -d'
+alias down='docker compose -f /home/xo/docker/compose.yaml --env-file /home/xo/docker/compose.env down'
+alias pull='docker compose -f /home/xo/docker/compose.yaml --env-file /home/xo/docker/compose.env pull'
+alias .yaml='nano /home/xo/docker/compose.yaml'
+alias .env='nano /home/xo/docker/compose.env'
