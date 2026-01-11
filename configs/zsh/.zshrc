@@ -125,11 +125,7 @@ bindkey '^ ' autosuggest-accept
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias install='sudo pacman -S'
-alias grepc='grep -n --color=auto'
-alias tu='sudo tailscale up'
-alias td='sudo tailscale down'
-alias bonsai='cbonsai -S'
+[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
 
 # Activate streamrip with 'sr'
 sr() {
