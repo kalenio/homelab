@@ -277,7 +277,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 128M
-    env_file: galaxy.env
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
