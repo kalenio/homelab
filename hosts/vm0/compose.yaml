@@ -5,7 +5,7 @@ services:
 # ============================================================== #
 
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:${JELLYFIN_VERS:-latest} # OR jellyfin/jellyfin (official)
+    image: jellyfin/jellyfin:${JELLYFIN_VERS:-latest}
     container_name: jellyfin
     security_opt:
       - no-new-privileges:true
@@ -21,8 +21,9 @@ services:
       - PUID=${UID}
       - PGID=${GID}
       - TZ=${TIMEZONE}
-#      - LIBVA_DRIVER_NAME=iHD
-#      - LIBVA_VAAPI_DEVICE=/dev/dri/renderD128
+      - JELLYFIN_PREFER_VAAPI=true  # tells Jellyfin to prefer hardware acceleration
+      - VAAPI_DRIVER=iHD            # Intel Arc GPU
+      - VAAPI_DEVICE=/dev/dri/renderD128
     group_add:
       - "105"  # 'render' group for Intel GPU access. Find with: ' getent group render | cut -d: -f3 '
     devices:
